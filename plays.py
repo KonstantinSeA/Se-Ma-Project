@@ -31,8 +31,7 @@ class Tile(pygame.sprite.Sprite):
             self.rect.x, self.rect.y = 50 * pos_x, 50 * pos_y
         if self.tile[0] == 'Water':
             super().__init__(all_sprites, tile_group, d_group)
-            self.image = pygame.Surface((50, 50), pygame.SRCALPHA, 32)
-            pygame.draw.rect(self.image, pygame.Color('blue'), (0, 0, 50, 50))
+            self.image = load_image(f'Water_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Water')
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 50 * pos_x, 50 * pos_y
 
@@ -75,7 +74,7 @@ class Hero(pygame.sprite.Sprite):
         super().__init__(all_sprites, hero_group)
         self.image = pygame.Surface((40, 60), pygame.SRCALPHA, 32)
         if v == 0:
-            pygame.draw.rect(self.image, pygame.Color('red'), (0, 0, 40, 60))
+            self.image = load_image('Character_00.png', 'Sprites/Hero/Character')
         elif v == 1:
             pygame.draw.rect(self.image, pygame.Color('magenta'), (0, 0, 40, 60))
         self.rect = self.image.get_rect()
@@ -104,8 +103,6 @@ class Hero(pygame.sprite.Sprite):
                 if pygame.sprite.groupcollide(hero_group, d_group, False, False):
                     self.rect.x -= 1
                     self.ori = 'r'
-        elif arg == 'da':
-            pass
 
 
 class NPC(Hero):
@@ -113,6 +110,19 @@ class NPC(Hero):
 
 
 class Character(Hero):
+    '''def __init__(self, v):
+        def __init__(self, v):
+            super(pygame.sprite.Sprite).__init__(all_sprites, hero_group)
+            self.image = pygame.Surface((40, 60), pygame.SRCALPHA, 32)
+            if v == 0:
+                self.image = load_image('Character_00.png', 'Sprites/Hero/Character')
+                self.rect = self.image.get_rect()
+            elif v == 1:
+                pygame.draw.rect(self.image, pygame.Color('magenta'), (0, 0, 40, 60))
+                self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 25, 25
+            self.ori = 'r'''
+
     def update(self, arg):
         super().update(arg)
         if arg == 'da':
