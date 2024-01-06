@@ -1,24 +1,50 @@
 import sys
 import pygame
-
+import os
 
 FPS = 60
 
 
+def load_image(name, road, colorkey=None):
+    fullname = os.path.join(road, name)
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением {fullname} не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    if colorkey is not None:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_it((0, 0))
+        image.set_colorkey(colorkey)
+    else:
+        image = image.convert_alpha()
+    return image
+
+
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile, pos_x, pos_y):
-        self.image = pygame.Surface((50, 50), pygame.SRCALPHA, 32)
-        tile = tile.split(';')
-        if tile[0] == 'Grass':
+        self.tile = tile.split(';')
+        if self.tile[0] == 'Grass':
             super().__init__(all_sprites, tile_group)
-            pygame.draw.rect(self.image, pygame.Color('green'), (0, 0, 50, 50))
+            self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 50 * pos_x, 50 * pos_y
-        if tile[0] == 'Water':
+        if self.tile[0] == 'Water':
             super().__init__(all_sprites, tile_group, d_group)
+            self.image = pygame.Surface((50, 50), pygame.SRCALPHA, 32)
             pygame.draw.rect(self.image, pygame.Color('blue'), (0, 0, 50, 50))
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 50 * pos_x, 50 * pos_y
+
+    def update(self, arg):
+        if arg == 'step':
+            if self.tile[0] == 'Grass':
+                self.tile[1] = '1'
+                self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
+        if arg == 's_grow':
+            if self.tile[0] == 'Grass':
+                self.tile[1] = '0'
+                self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
 
 
 def load_map(file):
@@ -55,7 +81,6 @@ class Hero(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = 25, 25
         self.ori = 'r'
-        self.inventory = Inventory('inva.txt')
 
     def update(self, arg):
         if arg[0] == 'm':
@@ -83,14 +108,28 @@ class Hero(pygame.sprite.Sprite):
             pass
 
 
+class NPC(Hero):
+    ...
+
+
+class Character(Hero):
+    def update(self, arg):
+        super().update(arg)
+        if arg == 'da':
+            pass
+
+
+pygame.init()
 all_sprites = pygame.sprite.Group()
 tile_group = pygame.sprite.Group()
 hero_group = pygame.sprite.Group()
 d_group = pygame.sprite.Group()
+s_grow_event = pygame.USEREVENT + 1
+pygame.time.set_timer(s_grow_event, 2500)
 size = width, height = 500, 500
 screen = pygame.display.set_mode(size)
 set_map(load_map('mapa.txt'))
-hero = Hero(1)
+character = Character(0)
 clock = pygame.time.Clock()
 running = True
 while running:
@@ -99,6 +138,8 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
             hero_group.update('da')
+        if event.type == s_grow_event:
+            tile_group.update('s_grow')
     if pygame.key.get_pressed()[pygame.K_UP] or pygame.key.get_pressed()[pygame.K_w]:
         hero_group.update('mu')
     if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]:
@@ -107,6 +148,10 @@ while running:
         hero_group.update('md')
     if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_d]:
         hero_group.update('mr')
+    hit_sprite = pygame.sprite.spritecollide(character, tile_group, False)
+    for i in range(len(hit_sprite)):
+        hit_sprite[i].update('step')
+
     screen.fill('white')
     tile_group.draw(screen)
     hero_group.draw(screen)
