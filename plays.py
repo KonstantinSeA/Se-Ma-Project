@@ -5,6 +5,16 @@ import os
 FPS = 60
 
 
+class Game:
+    def __init__(self, save):
+        self.save = save
+        set_map(load_map(f'Saves/Save{self.save}/Map.txt'))
+        self.character = Character(0, f'Saves/Save{self.save}/Inv.txt')
+
+    def save(self):
+        pass
+
+
 def load_image(name, road, colorkey=None):
     fullname = os.path.join(road, name)
     if not os.path.isfile(fullname):
@@ -110,23 +120,22 @@ class NPC(Hero):
 
 
 class Character(Hero):
-    '''def __init__(self, v):
-        def __init__(self, v):
-            super(pygame.sprite.Sprite).__init__(all_sprites, hero_group)
-            self.image = pygame.Surface((40, 60), pygame.SRCALPHA, 32)
-            if v == 0:
-                self.image = load_image('Character_00.png', 'Sprites/Hero/Character')
-                self.rect = self.image.get_rect()
-            elif v == 1:
-                pygame.draw.rect(self.image, pygame.Color('magenta'), (0, 0, 40, 60))
-                self.rect = self.image.get_rect()
-            self.rect.x, self.rect.y = 25, 25
-            self.ori = 'r'''
+    def __init__(self, v, inv):
+        super().__init__(v)
+        self.inv = Inventory(inv)
 
     def update(self, arg):
         super().update(arg)
         if arg == 'da':
             pass
+
+
+class GameClock:
+    def __init__(self):
+        pass
+
+    def time_update(self):
+        pass
 
 
 pygame.init()
@@ -136,11 +145,13 @@ hero_group = pygame.sprite.Group()
 d_group = pygame.sprite.Group()
 s_grow_event = pygame.USEREVENT + 1
 pygame.time.set_timer(s_grow_event, 2500)
-size = width, height = 500, 500
+size = width, height = 1000, 800
 screen = pygame.display.set_mode(size)
-set_map(load_map('mapa.txt'))
-character = Character(0)
+game = Game('a')
 clock = pygame.time.Clock()
+game_clock = GameClock()
+time_update = pygame.USEREVENT + 1
+pygame.time.set_timer(time_update, 7500)
 running = True
 while running:
     for event in pygame.event.get():
@@ -150,6 +161,8 @@ while running:
             hero_group.update('da')
         if event.type == s_grow_event:
             tile_group.update('s_grow')
+        if event.type == time_update:
+            game_clock.time_update()
     if pygame.key.get_pressed()[pygame.K_UP] or pygame.key.get_pressed()[pygame.K_w]:
         hero_group.update('mu')
     if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]:
@@ -158,7 +171,7 @@ while running:
         hero_group.update('md')
     if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_d]:
         hero_group.update('mr')
-    hit_sprite = pygame.sprite.spritecollide(character, tile_group, False)
+    hit_sprite = pygame.sprite.spritecollide(game.character, tile_group, False)
     for i in range(len(hit_sprite)):
         hit_sprite[i].update('step')
 
