@@ -1,1 +1,2 @@
-print('>_<')
+while True:
+    print('\u2603')
