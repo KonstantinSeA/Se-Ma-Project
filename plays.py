@@ -141,7 +141,7 @@ class Hero(pygame.sprite.Sprite):
         elif v == 1:
             pygame.draw.rect(self.image, pygame.Color('magenta'), (0, 0, 20, 45))
         self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = 25, 25
+        self.rect.x, self.rect.y = 500, 400
         self.ori = 'r'
 
     def update(self, arg):
@@ -214,6 +214,18 @@ class GameClock:
         screen.blit(text, (80, 55))
 
 
+class Camera:
+    def __init__(self):
+        self.dx, self.dy = 0, 0
+
+    def appply(self, object):
+        object.rect = object.rect.move(self.dx, self.dy)
+
+    def update(self, target):
+        self.dx = width // 2 - target.rect.x - target.rect.w // 2
+        self.dy = height // 2 - target.rect.y - target.rect.h // 2
+
+
 pygame.init()
 all_sprites = pygame.sprite.Group()
 tile_group = pygame.sprite.Group()
@@ -227,6 +239,7 @@ screen = pygame.display.set_mode(size)
 game = Game('a')
 clock = pygame.time.Clock()
 running = True
+camera = Camera()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -243,6 +256,8 @@ while running:
             hero_group.update('4')
         if event.type == pygame.KEYDOWN and event.key == pygame.K_5:
             hero_group.update('5')
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_u:
+            hero_group.update('5')
         if event.type == game.time_update:
             game.game_clock.time_update()
     if pygame.key.get_pressed()[pygame.K_UP] or pygame.key.get_pressed()[pygame.K_w]:
@@ -255,6 +270,10 @@ while running:
         hero_group.update('mr')
 
     screen.fill('white')
+    camera.update(game.character)
+    camera.appply(game.character)
+    for sprite in tile_group:
+        camera.appply(sprite)
     tile_group.draw(screen)
     hero_group.draw(screen)
     game.game_clock.draw_time(screen)
