@@ -23,13 +23,16 @@ vid.set_size((1280, 720))
 intro = Video("intro.mp4")
 intro.set_size((1280, 720))
 
+time_update = pygame.USEREVENT + 1
+pygame.time.set_timer(time_update, 4500)
+
 def menu():
     intro_v = True
     while intro_v:
         intro.draw(screen, (0, 0))
         pygame.display.update()
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == time_update:
                 intro_v = False
                 intro.close()
     running = True
