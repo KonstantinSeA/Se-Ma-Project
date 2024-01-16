@@ -32,8 +32,8 @@ def load_image(name, road, colorkey=None):
         if colorkey == -1:
             colorkey = image.get_it((0, 0))
         image.set_colorkey(colorkey)
-    else:
-        image = image.convert_alpha()
+    '''else:
+        image = image.convert_alpha()'''
     return image
 
 
@@ -44,7 +44,7 @@ class Tile(pygame.sprite.Sprite):
             super().__init__(all_sprites, tile_group, g_group)
             self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
             self.rect = self.image.get_rect()
-            self.rect.x, self.rect.y = 25 * pos_x + 80, 25 * pos_y + 80
+            self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
         if self.tile[0] == 'Water':
             super().__init__(all_sprites, tile_group, d_group)
             self.image = load_image(f'Water_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Water')
@@ -142,30 +142,39 @@ class Hero(pygame.sprite.Sprite):
             pygame.draw.rect(self.image, pygame.Color('magenta'), (0, 0, 20, 45))
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = 500, 400
+        self.absolute_x, self.absolute_y = 500, 400
         self.ori = 'r'
 
     def update(self, arg):
         if arg[0] == 'm':
             if arg[1] == 'u':
                 self.ori = 'u'
-                self.rect.y -= 1
+                self.rect.y -= 5
+                self.absolute_y -= 5
                 if pygame.sprite.groupcollide(hero_group, d_group, False, False):
-                    self.rect.y += 1
+                    self.rect.y += 5
+                    self.absolute_y += 5
             elif arg[1] == 'l':
                 self.ori = 'l'
-                self.rect.x -= 1
+                self.rect.x -= 5
+                self.absolute_x -= 5
                 if pygame.sprite.groupcollide(hero_group, d_group, False, False):
-                    self.rect.x += 1
+                    self.rect.x += 5
+                    self.absolute_x += 5
             elif arg[1] == 'd':
                 self.ori = 'd'
-                self.rect.y += 1
+                self.rect.y += 5
+                self.absolute_y += 5
                 if pygame.sprite.groupcollide(hero_group, d_group, False, False):
-                    self.rect.y -= 1
+                    self.rect.y -= 5
+                    self.absolute_y -= 5
             elif arg[1] == 'r':
                 self.ori = 'r'
-                self.rect.x += 1
+                self.rect.x += 5
+                self.absolute_x += 5
                 if pygame.sprite.groupcollide(hero_group, d_group, False, False):
-                    self.rect.x -= 1
+                    self.rect.x -= 5
+                    self.absolute_x -= 5
 
 
 class NPC(Hero):
@@ -192,6 +201,7 @@ class Character(Hero):
             self.shoosed_item = 4
         elif arg == '5':
             self.shoosed_item = 5
+        print(self.rect.x, self.rect.y, '----', self.absolute_x, self.absolute_y)
 
 
 class GameClock:
@@ -217,13 +227,63 @@ class GameClock:
 class Camera:
     def __init__(self):
         self.dx, self.dy = 0, 0
+        self.absolute_x, self.absolute_y = 0, 0
 
-    def appply(self, object):
-        object.rect = object.rect.move(self.dx, self.dy)
+    def appply(self, obj):
+        if 500 < self.absolute_x < 760 and 400 < self.absolute_y < 610:
+            obj.rect = obj.rect.move(self.dx, self.dy)
+        elif 500 < self.absolute_x < 760:
+            obj.rect = obj.rect.move(self.dx, 0)
+        elif 400 < self.absolute_y < 610:
+            obj.rect = obj.rect.move(0, self.dy)
 
     def update(self, target):
         self.dx = width // 2 - target.rect.x - target.rect.w // 2
         self.dy = height // 2 - target.rect.y - target.rect.h // 2
+        self.absolute_x, self.absolute_y = target.absolute_x, target.absolute_y
+
+
+class FonWall(pygame.sprite.Sprite):
+    def __init__(self, t):
+        super().__init__(all_sprites, d_group, wall_group)
+        if t == 'l':
+            self.image = pygame.Surface((45, 1400), pygame.SRCALPHA, 32)
+            pygame.draw.line(self.image, 'red', (0, 0), (0, 1400), 45)
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 0, 0
+        if t == 'r':
+            self.image = pygame.Surface((45, 1400), pygame.SRCALPHA, 32)
+            pygame.draw.line(self.image, 'red', (0, 0), (0, 1400), 45)
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 1240, 0
+        if t == 'u':
+            self.image = pygame.Surface((1400, 95), pygame.SRCALPHA, 32)
+            pygame.draw.line(self.image, 'red', (0, 0), (1400, 0), 125)
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 0, 0
+        if t == 'd':
+            self.image = pygame.Surface((1400, 5), pygame.SRCALPHA, 32)
+            pygame.draw.line(self.image, 'red', (0, 0), (1400, 0), 5)
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 0, 980
+        if t == 'vu':
+            self.image = pygame.Surface((600, 130), pygame.SRCALPHA, 32)
+            pygame.draw.line(self.image, 'red', (0, 0), (600, 0), 125)
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 800, 0
+
+
+class Fon(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(all_sprites, tile_group)
+        self.image = load_image(f'Farm_Fon.png', 'Sprites')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 0, 0
+        FonWall('l')
+        FonWall('r')
+        FonWall('u')
+        FonWall('d')
+        FonWall('vu')
 
 
 pygame.init()
@@ -234,6 +294,9 @@ d_group = pygame.sprite.Group()
 g_group = pygame.sprite.Group()
 menu_group = pygame.sprite.Group()
 worked_group = pygame.sprite.Group()
+fon_group = pygame.sprite.Group()
+wall_group = pygame.sprite.Group()
+Fon()
 size = width, height = 1000, 800
 screen = pygame.display.set_mode(size)
 game = Game('a')
@@ -274,9 +337,11 @@ while running:
     camera.appply(game.character)
     for sprite in tile_group:
         camera.appply(sprite)
+    for sprite in wall_group:
+        camera.appply(sprite)
     tile_group.draw(screen)
     hero_group.draw(screen)
     game.game_clock.draw_time(screen)
     menu_group.draw(screen)
-    clock.tick(FPS)
     pygame.display.flip()
+    clock.tick(FPS)
