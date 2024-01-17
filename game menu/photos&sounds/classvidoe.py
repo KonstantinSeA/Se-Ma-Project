@@ -82,7 +82,7 @@ class Video:
                                                      frame[0].get_size(), "RGB")
         return updated
 
-    def draw(self, surf, pos, force_draw=True):
+    def draw_video(self, surf, pos, force_draw=True):
         if self.active:
             if self.update() or force_draw:
                 surf.blit(self.image, pos)
