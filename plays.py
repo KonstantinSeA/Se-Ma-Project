@@ -17,8 +17,6 @@ def load_image(name, road, colorkey=None):
         if colorkey == -1:
             colorkey = image.get_it((0, 0))
         image.set_colorkey(colorkey)
-    '''else:
-        image = image.convert_alpha()'''
     return image
 
 
@@ -185,7 +183,8 @@ class Hero(pygame.sprite.Sprite):
                 self.shoosed_item = 5
             print(self.rect.x, self.rect.y, '----', self.absolute_x, self.absolute_y)
         if pygame.sprite.spritecollideany(self.boots, game.home_t_group):
-            print(1)
+            game.run_type = 'home'
+            self.rect.x, self.rect.y = 421, 380
         self.boots.update(self)
 
 
@@ -297,6 +296,9 @@ class Home:
         self.wall = HomeWall()
         self.terrace = HomeTerrace()
         self.mat = HomeMat()
+        self.in_fon = InHomeFon()
+        self.in_border = InHomeFonBorders()
+        self.in_moved = InHomeMoved()
 
 
 class HomeRoof(pygame.sprite.Sprite):
@@ -330,6 +332,31 @@ class HomeWall(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = 800, 355
         self.mask = pygame.mask.from_surface(self.image)
+
+
+class InHomeFon(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(game.all_home_sprites)
+        self.image = load_image(f'InHome_Fon.png', 'Sprites/Home')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 350, 139
+
+
+class InHomeMoved(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(game.moved_home_sprites)
+        self.image = load_image(f'InHome_Moved.png', 'Sprites/Home')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 350, 139
+
+
+class InHomeFonBorders(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(game.all_home_sprites)
+        self.image = load_image(f'InHome_Border.png', 'Sprites/Home')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 350, 139
+
 
 
 class Game:
@@ -386,7 +413,50 @@ class Game:
                 pygame.display.flip()
                 self.clock.tick(FPS)
             elif self.run_type == 'home':
-                ...
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
+                        self.hero_group.update('da')
+                if pygame.key.get_pressed()[pygame.K_UP] or pygame.key.get_pressed()[
+                    pygame.K_w]:
+                    self.character.ori = 'u'
+                    self.character.rect.y -= 1
+                    self.character.boots.update(self.character)
+                    if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
+                        self.character.rect.y += 1
+                if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[
+                    pygame.K_a]:
+                    self.character.ori = 'l'
+                    self.character.rect.x -= 1
+                    self.character.boots.update(self.character)
+                    if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
+                        self.character.rect.x += 1
+                if pygame.key.get_pressed()[pygame.K_DOWN] or pygame.key.get_pressed()[
+                    pygame.K_s]:
+                    self.character.ori = 'd'
+                    self.character.rect.y += 1
+                    self.character.boots.update(self.character)
+                    if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
+                        self.character.rect.y -= 1
+                    print(self.character.boots.rect.x, self.character.boots.rect.y)
+                if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[
+                    pygame.K_d]:
+                    self.character.ori = 'r'
+                    self.character.rect.x += 1
+                    self.character.boots.update(self.character)
+                    if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
+                        self.character.rect.x -= 1
+                self.screen.fill('white')
+                self.all_home_sprites.draw(self.screen)
+                self.hero_group.draw(self.screen)
+                self.moved_home_sprites.draw(self.screen)
+                if self.character.boots.rect.y > 425:
+                    self.run_type = 'farm'
+                    self.character.rect.x, self.character.rect.y = 645, 378
+                    self.character.absolute_x, self.character.absolute_y = 910, 505
+                pygame.display.flip()
+                self.clock.tick(FPS)
 
 
     def init(self):
@@ -404,6 +474,8 @@ class Game:
         self.d_mask_group = pygame.sprite.Group()
         self.walked_group = pygame.sprite.Group()
         self.home_t_group = pygame.sprite.Group()
+        self.all_home_sprites = pygame.sprite.Group()
+        self.moved_home_sprites = pygame.sprite.Group()
         Fon()
         self.size = self.width, self.height = 1000, 800
         self.screen = pygame.display.set_mode(self.size)
