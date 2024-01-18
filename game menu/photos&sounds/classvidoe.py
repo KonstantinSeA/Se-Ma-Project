@@ -86,3 +86,6 @@ class Video:
         if self.active:
             if self.update() or force_draw:
                 surf.blit(self.image, pos)
+
+    def get_pts(self):
+        return int(self.video.get_pts())

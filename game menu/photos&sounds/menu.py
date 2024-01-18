@@ -16,27 +16,39 @@ save_button = PhotoButton(width / 2 - (250/2), 450, 220, 175, "", "save_button_h
                           "save_button_show.png", "button_click.mp3")
 exit_button = PhotoButton(width / 2 - (-270/2), 450, 220, 175, "", "exit_button_hide.png",
                           "exit_button_show.png", "button_click.mp3")
+back_button = PhotoButton(width / 2 - (-800/2), 625, 200, 80, "", "back_button_hide.png",
+                          "back_button_show.png", "button_click.mp3")
+woman_button = PhotoButton(width / 2 - (-20/2), 320, 90, 90, "", "player_woman_hide.png",
+                          "", "button_click.mp3")
+man_button = PhotoButton(width / 2 - (200/2), 320, 90, 90, "", "player_man_show.png",
+                          "", "button_click.mp3")
 
 vid = Video("videomenu.mp4")
 vid.set_size((1280, 720))
 intro = Video("intro.mp4")
 intro.set_size((1280, 720))
-pygame.mixer.music.load("Farmers Valley.mp3")
+pygame.mixer.music.load("Farmers_Valley.mp3")
 pygame.mixer.music.play(-1)
+video_time = pygame.USEREVENT + 1
+pygame.time.set_timer(video_time, 30000)
 time_update = pygame.USEREVENT + 1
 pygame.time.set_timer(time_update, 4500)
+intro_check = True
 
 
 def menu():
+    global intro_check
     running = True
     intro_v = True
-    while intro_v:
-        for event in pygame.event.get():
-            if event.type == time_update:
-                intro_v = False
-                intro.close()
-        intro.draw_video(screen, (0, 0))
-        pygame.display.update()
+    if intro_check:
+        while intro_v:
+            for event in pygame.event.get():
+                if event.type == time_update:
+                    intro_v = False
+                    intro_check = False
+                    intro.close()
+            intro.draw_video(screen, (0, 0))
+            pygame.display.update()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -48,8 +60,10 @@ def menu():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.USEREVENT and event.button == play_button:
+                running = False
+                vid.toggle_pause()
                 play_start()
-            if event.type == time_update:
+            if vid.get_pts() >= 57:
                 vid.restart()
             for own_button in [play_button, save_button, exit_button]:
                 own_button.events(event)
@@ -64,7 +78,36 @@ def menu():
 
 
 def play_start():
-    pass
+    global woman_button, man_button
+    running = True
+    player = Video("playerpick.mp4")
+    player.set_size((1280, 720))
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                sys.exit()
+            if player.get_pts() >= 55:
+                player.restart()
+            if event.type == pygame.USEREVENT and event.button == back_button:
+                vid.toggle_pause()
+                player.close()
+                menu()
+            if event.type == pygame.USEREVENT and event.button == woman_button:
+                pass
+            if event.type == pygame.USEREVENT and event.button == man_button:
+                pass
+            for own_button in [back_button]:
+                own_button.events(event)
+        player.draw_video(screen, (0, 0))
+        back_button.check_mouse(pygame.mouse.get_pos())
+        back_button.draw_button(screen)
+        woman_button.check_mouse(pygame.mouse.get_pos())
+        woman_button.draw_button(screen)
+        man_button.check_mouse(pygame.mouse.get_pos())
+        man_button.draw_button(screen)
+        pygame.display.update()
 
 
 menu()
