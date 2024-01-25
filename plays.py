@@ -34,7 +34,13 @@ class Tile(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 25 * pos_x + 80, 25 * pos_y + 80
         elif self.tile[0] == 'Stump':
-            pass
+            super().__init__(game.all_sprites, game.tile_group, game.d_mask_group)
+            self.image = load_image(f'Stump_mask.png', 'Sprites/Wood')
+            self.mask = pygame.mask.from_surface(self.image)
+            self.image = load_image(f'Stump.png', 'Sprites/Wood')
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = x, y
+            self.hp = 10
         elif self.tile[0] == 'Tree':
             super().__init__(game.all_sprites, game.tile_group,
                              game.d_mask_group, game.walked_group)
@@ -44,6 +50,7 @@ class Tile(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 25 * pos_x + 80 - 35, 25 * pos_y + 80 - 30
             self.sub = SubTile(25 * pos_x + 80 - 35, 25 * pos_y + 80 - 30, 'td')
+            self.hp = 15
 
     def update(self, arg):
         if (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
@@ -51,14 +58,35 @@ class Tile(pygame.sprite.Sprite):
             self.tile[0] = 'Zemla'
             self.image = load_image('Zemla.jpg', 'Sprites')
             small_grow_tile.append([self, 6])
-        if self.tile[0] == 'Zemla' and arg == 'sge':
+        elif self.tile[0] == 'Zemla' and arg == 'sge':
             self.tile[0] = 'Grass'
             self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
-        if (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
+        elif (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
                 self.tile[0] == 'Gradka') and arg == 'uwh':
             self.tile[0] = 'Gradka'
             self.image = load_image('Gradka.jpg', 'Sprites')
             small_grow_tile.append([self, 24])
+        elif self.tile[0] == 'Tree':
+            if arg == 'ua':
+                self.hp -= 1
+            elif arg == 'uia':
+                self.hp -= 2
+            elif arg == 'uga':
+                self.hp -= 3
+            elif arg == 'uira':
+                self.hp -= 5
+            if self.hp < 1:
+                self.sub.kill()
+                x, y = self.rect.x, self.rect.y
+                self.kill()
+                self.tile[0] = 'Stump'
+                super().__init__(game.all_sprites, game.tile_group, game.d_mask_group)
+                self.image = load_image(f'Stump_mask.png', 'Sprites/Wood')
+                self.mask = pygame.mask.from_surface(self.image)
+                self.image = load_image(f'Stump.png', 'Sprites/Wood')
+                self.rect = self.image.get_rect()
+                self.rect.x, self.rect.y = x + 30,  y + 90
+                self.hp = 10
 
 
 class SubTile(pygame.sprite.Sprite):
@@ -94,10 +122,7 @@ class Item(pygame.sprite.Sprite):
         self.name, self.pos = item_name, pos
         self.image = load_image(f'{item_name}.png', f'Sprites/Items')
         self.rect = self.image.get_rect()
-        if self.pos <= 5:
-            self.rect.x, self.rect.y = 450 + 25 * self.pos, 55
-        else:
-            self.rect.x, self.rect.y = -50, -50
+        self.rect.x, self.rect.y = 218 + 48 * self.pos, 758
 
     def use(self, ori, pos):
         point = MyPoint(ori, pos)
@@ -108,6 +133,14 @@ class Item(pygame.sprite.Sprite):
                 used_tile[1].update('uws')
             elif self.name == 'wood_hoe':
                 used_tile[1].update('uwh')
+            elif self.name == 'Axe':
+                used_tile[1].update('ua')
+            elif self.name == 'Iron_Axe':
+                used_tile[1].update('uia')
+            elif self.name == 'Gold_Axe':
+                used_tile[1].update('uga')
+            elif self.name == 'Ir_Axe':
+                used_tile[1].update('uira')
         point.kill()
 
 
@@ -182,6 +215,29 @@ class Inventory(pygame.sprite.Sprite):
             self.choosed = 12
 
 
+class EnergyBar(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(game.all_sprites, game.menu_group)
+        self.energy = 35
+        self.image = load_image('EnergyBar4.png', 'Sprites/EnergyBar')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 940, 500
+
+    def enable(self):
+        if self.energy > 0:
+            return True
+        return False
+
+    def update(self):
+        self.energy -= 1
+        if 15 <= self.energy < 25:
+            self.image = load_image('EnergyBar3.png', 'Sprites/EnergyBar')
+        elif 5 <= self.energy < 15:
+            self.image = load_image('EnergyBar2.png', 'Sprites/EnergyBar')
+        elif self.energy < 5:
+            self.image = load_image('EnergyBar1.png', 'Sprites/EnergyBar')
+
+
 class Hero(pygame.sprite.Sprite):
     def __init__(self, v, inv):
         super().__init__(game.all_sprites, game.hero_group)
@@ -195,48 +251,54 @@ class Hero(pygame.sprite.Sprite):
         self.absolute_x, self.absolute_y = 500, 400
         self.ori = 'r'
         self.inv = Inventory(inv)
+        self.enb = EnergyBar()
         self.boots = HeroBoots(self)
 
     def update(self, arg):
         if arg[0] == 'm':
+            if self.enb.enable():
+                m = 5
+            else:
+                m = 2
             if arg[1] == 'u':
                 self.ori = 'u'
-                self.rect.y -= 5
-                self.absolute_y -= 5
+                self.rect.y -= m
+                self.absolute_y -= m
                 self.boots.update(self)
                 if pygame.sprite.groupcollide(game.hero_boots_group, game.d_group, False, False)\
                         or mask_collide(self.boots, game.d_mask_group):
-                    self.rect.y += 5
-                    self.absolute_y += 5
+                    self.rect.y += m
+                    self.absolute_y += m
             elif arg[1] == 'l':
                 self.ori = 'l'
-                self.rect.x -= 5
-                self.absolute_x -= 5
+                self.rect.x -= m
+                self.absolute_x -= m
                 self.boots.update(self)
                 if pygame.sprite.groupcollide(game.hero_boots_group, game.d_group, False, False)\
                         or mask_collide(self.boots, game.d_mask_group):
-                    self.rect.x += 5
-                    self.absolute_x += 5
+                    self.rect.x += m
+                    self.absolute_x += m
             elif arg[1] == 'd':
                 self.ori = 'd'
-                self.rect.y += 5
-                self.absolute_y += 5
+                self.rect.y += m
+                self.absolute_y += m
                 self.boots.update(self)
                 if pygame.sprite.groupcollide(game.hero_boots_group, game.d_group, False, False)\
                         or mask_collide(self.boots, game.d_mask_group):
-                    self.rect.y -= 5
-                    self.absolute_y -= 5
+                    self.rect.y -= m
+                    self.absolute_y -= m
             elif arg[1] == 'r':
                 self.ori = 'r'
-                self.rect.x += 5
-                self.absolute_x += 5
+                self.rect.x += m
+                self.absolute_x += m
                 self.boots.update(self)
                 if pygame.sprite.groupcollide(game.hero_boots_group, game.d_group, False, False)\
                         or mask_collide(self.boots, game.d_mask_group):
-                    self.rect.x -= 5
-                    self.absolute_x -= 5
-        elif arg == 'da':
+                    self.rect.x -= m
+                    self.absolute_x -= m
+        elif arg == 'da' and self.enb.enable():
             self.inv.update('da')
+            self.enb.update()
         print(self.rect.x, self.rect.y, '----', self.absolute_x, self.absolute_y)
         if pygame.sprite.spritecollideany(self.boots, game.home_t_group):
             game.run_type = 'home'

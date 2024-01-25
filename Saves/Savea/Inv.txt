@@ -1,3 +1,12 @@
+Axe
+None
+None
+Gold_Axe
+None
 wood_hoe
-seeds
 wood_shovel
+Iron_Axe
+Ir_Axe
+None
+None
+None
