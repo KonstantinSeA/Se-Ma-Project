@@ -101,12 +101,13 @@ class Item(pygame.sprite.Sprite):
 
     def use(self, ori, pos):
         point = MyPoint(ori, pos)
+        game.camera.appply(point)
         used_tile = pygame.sprite.spritecollide(point, game.all_sprites, False)
         if used_tile:
             if self.name == 'wood_shovel':
-                used_tile[0].update('uws')
+                used_tile[1].update('uws')
             elif self.name == 'wood_hoe':
-                used_tile[0].update('uwh')
+                used_tile[1].update('uwh')
         point.kill()
 
 
@@ -126,13 +127,59 @@ class MyPoint(pygame.sprite.Sprite):
             self.rect.x, self.rect.y = pos[0] + 10, pos[1] + 55
 
 
-class Inventory:
+class Inventory(pygame.sprite.Sprite):
     def __init__(self, file):
+        super().__init__(game.all_sprites, game.menu_group)
         self.items = []
         with open(file, mode='r', encoding='utf-8') as inventory_file:
             item_lines = list(map(str.rstrip, inventory_file.readlines()))
             for i in range(len(item_lines)):
                 self.items.append(Item(item_lines[i], i))
+        self.choosed = 1
+        self.image = load_image('InvC1.png', 'Sprites/Inv')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 200, 739
+
+    def update(self, arg):
+        if arg == 'da':
+            self.items[self.choosed - 1].use(game.character.ori,
+                                             (game.character.rect.x, game.character.rect.y))
+        elif arg == '1':
+            self.image = load_image('InvC1.png', 'Sprites/Inv')
+            self.choosed = 1
+        elif arg == '2':
+            self.image = load_image('InvC2.png', 'Sprites/Inv')
+            self.choosed = 2
+        elif arg == '3':
+            self.image = load_image('InvC3.png', 'Sprites/Inv')
+            self.choosed = 3
+        elif arg == '4':
+            self.image = load_image('InvC4.png', 'Sprites/Inv')
+            self.choosed = 4
+        elif arg == '5':
+            self.image = load_image('InvC5.png', 'Sprites/Inv')
+            self.choosed = 5
+        elif arg == '6':
+            self.image = load_image('InvC6.png', 'Sprites/Inv')
+            self.choosed = 6
+        elif arg == '7':
+            self.image = load_image('InvC7.png', 'Sprites/Inv')
+            self.choosed = 7
+        elif arg == '8':
+            self.image = load_image('InvC8.png', 'Sprites/Inv')
+            self.choosed = 8
+        elif arg == '9':
+            self.image = load_image('InvC9.png', 'Sprites/Inv')
+            self.choosed = 9
+        elif arg == '10':
+            self.image = load_image('InvC10.png', 'Sprites/Inv')
+            self.choosed = 10
+        elif arg == '11':
+            self.image = load_image('InvC11.png', 'Sprites/Inv')
+            self.choosed = 11
+        elif arg == '12':
+            self.image = load_image('InvC12.png', 'Sprites/Inv')
+            self.choosed = 12
 
 
 class Hero(pygame.sprite.Sprite):
@@ -148,7 +195,6 @@ class Hero(pygame.sprite.Sprite):
         self.absolute_x, self.absolute_y = 500, 400
         self.ori = 'r'
         self.inv = Inventory(inv)
-        self.shoosed_item = 1
         self.boots = HeroBoots(self)
 
     def update(self, arg):
@@ -189,19 +235,9 @@ class Hero(pygame.sprite.Sprite):
                         or mask_collide(self.boots, game.d_mask_group):
                     self.rect.x -= 5
                     self.absolute_x -= 5
-            elif arg == 'da':
-                self.inv.items[self.shoosed_item - 1].use(self.ori, (self.rect.x, self.rect.y))
-            elif arg == '1':
-                self.shoosed_item = 1
-            elif arg == '2':
-                self.shoosed_item = 2
-            elif arg == '3':
-                self.shoosed_item = 3
-            elif arg == '4':
-                self.shoosed_item = 4
-            elif arg == '5':
-                self.shoosed_item = 5
-            print(self.rect.x, self.rect.y, '----', self.absolute_x, self.absolute_y)
+        elif arg == 'da':
+            self.inv.update('da')
+        print(self.rect.x, self.rect.y, '----', self.absolute_x, self.absolute_y)
         if pygame.sprite.spritecollideany(self.boots, game.home_t_group):
             game.run_type = 'home'
             self.rect.x, self.rect.y = 421, 380
@@ -378,7 +414,6 @@ class InHomeFonBorders(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = 350, 139
 
 
-
 class Game:
     def __init__(self, save):
         self.save = save
@@ -395,15 +430,29 @@ class Game:
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
                         self.hero_group.update('da')
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
-                        self.hero_group.update('1')
+                        self.character.inv.update('1')
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_2:
-                        self.hero_group.update('2')
+                        self.character.inv.update('2')
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_3:
-                        self.hero_group.update('3')
+                        self.character.inv.update('3')
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_4:
-                        self.hero_group.update('4')
+                        self.character.inv.update('4')
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_5:
-                        self.hero_group.update('5')
+                        self.character.inv.update('5')
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_6:
+                        self.character.inv.update('6')
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_7:
+                        self.character.inv.update('7')
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_8:
+                        self.character.inv.update('8')
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_9:
+                        self.character.inv.update('9')
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_0:
+                        self.character.inv.update('10')
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_MINUS:
+                        self.character.inv.update('11')
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_EQUALS:
+                        self.character.inv.update('12')
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_u:
                         self.hero_group.update('5')
                     if event.type == game.time_update:
