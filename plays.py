@@ -28,11 +28,22 @@ class Tile(pygame.sprite.Sprite):
             self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
-        if self.tile[0] == 'Water':
+        elif self.tile[0] == 'Water':
             super().__init__(game.all_sprites, game.tile_group, game.d_group)
             self.image = load_image(f'Water_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Water')
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 25 * pos_x + 80, 25 * pos_y + 80
+        elif self.tile[0] == 'Stump':
+            pass
+        elif self.tile[0] == 'Tree':
+            super().__init__(game.all_sprites, game.tile_group,
+                             game.d_mask_group, game.walked_group)
+            self.image = load_image(f'Tree_mask.png', 'Sprites/Wood')
+            self.mask = pygame.mask.from_surface(self.image)
+            self.image = load_image(f'TreeUp.png', 'Sprites/Wood')
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 25 * pos_x + 80 - 35, 25 * pos_y + 80 - 30
+            self.sub = SubTile(25 * pos_x + 80 - 35, 25 * pos_y + 80 - 30, 'td')
 
     def update(self, arg):
         if (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
@@ -48,6 +59,15 @@ class Tile(pygame.sprite.Sprite):
             self.tile[0] = 'Gradka'
             self.image = load_image('Gradka.jpg', 'Sprites')
             small_grow_tile.append([self, 24])
+
+
+class SubTile(pygame.sprite.Sprite):
+    def __init__(self, x, y, arg):
+        if arg == 'td':
+            super().__init__(game.all_sprites, game.tile_group)
+            self.image = load_image('TreeDown.png', 'Sprites/Wood')
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = x, y
 
 
 def load_map(file):
