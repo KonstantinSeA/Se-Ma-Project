@@ -2,7 +2,7 @@ import sys
 import pygame
 import os
 
-FPS = 60
+FPS = 30
 small_grow_tile = []
 
 
@@ -23,27 +23,29 @@ def load_image(name, road, colorkey=None):
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile, pos_x, pos_y):
         self.tile = tile.split(';')
+        self.x, self.y = pos_x, pos_y
         if self.tile[0] == 'Grass':
-            super().__init__(game.all_sprites, game.tile_group, game.g_group)
+            super().__init__(game.all_sprites, game.tile_group, game.map_tile_group, game.g_group)
             self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
         elif self.tile[0] == 'Water':
-            super().__init__(game.all_sprites, game.tile_group, game.d_group)
+            super().__init__(game.all_sprites, game.tile_group, game.d_group, game.map_tile_group)
             self.image = load_image(f'Water_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Water')
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 25 * pos_x + 80, 25 * pos_y + 80
         elif self.tile[0] == 'Stump':
-            super().__init__(game.all_sprites, game.tile_group, game.d_mask_group)
+            super().__init__(game.all_sprites, game.tile_group,
+                             game.d_mask_group, game.map_tile_group)
             self.image = load_image(f'Stump_mask.png', 'Sprites/Wood')
             self.mask = pygame.mask.from_surface(self.image)
             self.image = load_image(f'Stump.png', 'Sprites/Wood')
             self.rect = self.image.get_rect()
-            self.rect.x, self.rect.y = x, y
+            self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
             self.hp = 10
         elif self.tile[0] == 'Tree':
             super().__init__(game.all_sprites, game.tile_group,
-                             game.d_mask_group, game.walked_group)
+                             game.d_mask_group, game.walked_group, game.map_tile_group)
             self.image = load_image(f'Tree_mask.png', 'Sprites/Wood')
             self.mask = pygame.mask.from_surface(self.image)
             self.image = load_image(f'TreeUp.png', 'Sprites/Wood')
@@ -80,7 +82,8 @@ class Tile(pygame.sprite.Sprite):
                 x, y = self.rect.x, self.rect.y
                 self.kill()
                 self.tile[0] = 'Stump'
-                super().__init__(game.all_sprites, game.tile_group, game.d_mask_group)
+                super().__init__(game.all_sprites, game.tile_group,
+                                 game.d_mask_group, game.map_tile_group)
                 self.image = load_image(f'Stump_mask.png', 'Sprites/Wood')
                 self.mask = pygame.mask.from_surface(self.image)
                 self.image = load_image(f'Stump.png', 'Sprites/Wood')
@@ -230,7 +233,9 @@ class EnergyBar(pygame.sprite.Sprite):
 
     def update(self):
         self.energy -= 1
-        if 15 <= self.energy < 25:
+        if self.energy > 24:
+            self.image = load_image('EnergyBar4.png', 'Sprites/EnergyBar')
+        elif 15 <= self.energy < 25:
             self.image = load_image('EnergyBar3.png', 'Sprites/EnergyBar')
         elif 5 <= self.energy < 15:
             self.image = load_image('EnergyBar2.png', 'Sprites/EnergyBar')
@@ -326,9 +331,13 @@ class HeroBoots(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = hero.rect.x, hero.rect.y + 30
 
 
-class GameClock:
-    def __init__(self, mounts, days):
-        self.mounts, self.days, self.hours, self.minuts = mounts, days, 0, 0
+class GameClock(pygame.sprite.Sprite):
+    def __init__(self, days):
+        super().__init__(game.all_sprites, game.menu_group)
+        self.days, self.hours, self.minuts = int(days), 4, 0
+        self.image = load_image('Time.png', 'Sprites/Inv')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 800, 25
 
     def time_update(self):
         self.minuts += 10
@@ -339,11 +348,30 @@ class GameClock:
             if t[1] == 0:
                 t[0].update('sge')
                 small_grow_tile.remove(t)
+        if self.hours > 23:
+            game.money.m = game.money.m // 10 * 9
+            game.next_day()
 
     def draw_time(self, screen):
-        font = pygame.font.SysFont('Times New Roman', 15)
+        font = pygame.font.SysFont('Times New Roman', 25)
         text = font.render(f'Время: {self.hours}:{self.minuts}', False, (0, 0, 0))
-        screen.blit(text, (80, 55))
+        screen.blit(text, (820, 80))
+        text = font.render(f'Дней: {self.days}', False, (0, 0, 0))
+        screen.blit(text, (820, 40))
+
+
+class Money(pygame.sprite.Sprite):
+    def __init__(self, m):
+        super().__init__(game.all_sprites, game.menu_group)
+        self.image = load_image('Money.png', 'Sprites/Inv')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 800, 125
+        self.m = int(m)
+
+    def print_money(self, screen):
+        font = pygame.font.SysFont('Times New Roman', 25)
+        text = font.render(str(self.m), False, (0, 0, 0))
+        screen.blit(text, (840, 155))
 
 
 class Camera:
@@ -481,7 +509,30 @@ class Game:
         self.save = save
 
     def next_day(self):
-        pass
+        self.game_clock.days += 1
+        self.game_clock.hours = 4
+        self.game_clock.minuts = 0
+        old_map = load_map(f'Saves/Save{self.save}/Map.txt')[0]
+        for tile in self.map_tile_group:
+            old_map[tile.y][tile.x] = ';'.join(tile.tile)
+        for i in range(len(old_map)):
+            old_map[i] = ' '.join(old_map[i])
+        with open(f'Saves/Save{self.save}/Map.txt', mode='w', encoding='utf-8') as map_file:
+            map_file.writelines('\n'.join(old_map))
+        with open(f'Saves/Save{self.save}/Save.txt', mode='r', encoding='utf-8') as save_file:
+            old_save = save_file.readlines()
+        old_save[2] = str(self.game_clock.days) + '\n'
+        old_save[3] = str(self.money.m) + '\n'
+        with open(f'Saves/Save{self.save}/Save.txt', mode='w', encoding='utf-8') as save_file:
+            save_file.writelines(''.join(old_save))
+            print(old_save)
+        if self.run_type == 'home':
+            self.character.rect.x, self.character.rect.y = 382, 275
+            self.character.enb.energy = 36
+            self.character.enb.update()
+        else:
+            self.character.enb.energy = 16
+            self.character.enb.update()
 
     def run(self):
         while self.running:
@@ -539,40 +590,38 @@ class Game:
                 self.tile_group.draw(self.screen)
                 self.hero_group.draw(self.screen)
                 self.walked_group.draw(self.screen)
-                self.game_clock.draw_time(self.screen)
                 self.menu_group.draw(self.screen)
+                self.game_clock.draw_time(self.screen)
+                self.money.print_money(self.screen)
                 pygame.display.flip()
                 self.clock.tick(FPS)
             elif self.run_type == 'home':
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.running = False
-                    if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
-                        self.hero_group.update('da')
-                if pygame.key.get_pressed()[pygame.K_UP] or pygame.key.get_pressed()[
-                    pygame.K_w]:
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_e and \
+                            586 < self.character.rect.x and 357 < self.character.rect.y:
+                        self.next_day()
+                if pygame.key.get_pressed()[pygame.K_UP] or pygame.key.get_pressed()[pygame.K_w]:
                     self.character.ori = 'u'
                     self.character.rect.y -= 1
                     self.character.boots.update(self.character)
                     if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
                         self.character.rect.y += 1
-                if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[
-                    pygame.K_a]:
+                if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]:
                     self.character.ori = 'l'
                     self.character.rect.x -= 1
                     self.character.boots.update(self.character)
                     if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
                         self.character.rect.x += 1
-                if pygame.key.get_pressed()[pygame.K_DOWN] or pygame.key.get_pressed()[
-                    pygame.K_s]:
+                if pygame.key.get_pressed()[pygame.K_DOWN] or pygame.key.get_pressed()[pygame.K_s]:
                     self.character.ori = 'd'
                     self.character.rect.y += 1
                     self.character.boots.update(self.character)
                     if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
                         self.character.rect.y -= 1
                     print(self.character.boots.rect.x, self.character.boots.rect.y)
-                if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[
-                    pygame.K_d]:
+                if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_d]:
                     self.character.ori = 'r'
                     self.character.rect.x += 1
                     self.character.boots.update(self.character)
@@ -589,11 +638,11 @@ class Game:
                 pygame.display.flip()
                 self.clock.tick(FPS)
 
-
     def init(self):
         pygame.init()
         self.all_sprites = pygame.sprite.Group()
         self.tile_group = pygame.sprite.Group()
+        self.map_tile_group = pygame.sprite.Group()
         self.hero_group = pygame.sprite.Group()
         self.hero_boots_group = pygame.sprite.Group()
         self.d_group = pygame.sprite.Group()
@@ -618,10 +667,11 @@ class Game:
             data_lines = save_file.readlines()
         self.character = Hero(0, f'Saves/Save{self.save}/Inv.txt')
         self.run_type = 'farm'
-        self.game_clock = GameClock(data_lines[2].split('; ')[0], data_lines[2].split('; ')[1])
+        self.game_clock = GameClock(data_lines[2])
+        self.money = Money(data_lines[3])
         self.time_update = pygame.USEREVENT + 1
         self.home = Home()
-        pygame.time.set_timer(self.time_update, 7000)
+        pygame.time.set_timer(self.time_update, 3500)
 
 
 game = Game('a')
