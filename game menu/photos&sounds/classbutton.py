@@ -2,8 +2,8 @@ import pygame
 
 
 class PhotoButton:
-    def __init__(self, x: object, y: object, witdh: object, height: object, text: object, image_path: object, hower_image_path: object = None,
-                 sound_p: object = None) -> object:
+    def __init__(self, x: object, y: object, witdh: object, height: object, text: object, image_path: object,
+                 hower_image_path: object = None, sound_p: object = None):
         self.x = x
         self.y = y
         self.wigth = witdh
