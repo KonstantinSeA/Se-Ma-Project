@@ -4,6 +4,8 @@ import os
 
 FPS = 30
 small_grow_tile = []
+MI_LIST = ['Wood']
+
 
 
 def load_image(name, road, colorkey=None):
@@ -90,6 +92,7 @@ class Tile(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.x, self.rect.y = x + 30,  y + 90
                 self.hp = 10
+                game.character.inv.add_item('Wood', 15)
 
 
 class SubTile(pygame.sprite.Sprite):
@@ -120,9 +123,11 @@ def set_map(map_level):
 
 
 class Item(pygame.sprite.Sprite):
-    def __init__(self, item_name, pos):
+    def __init__(self, item_name, pos, *args):
         super().__init__(game.all_sprites, game.menu_group)
         self.name, self.pos = item_name, pos
+        if self.name == 'Wood':
+            self.count = int(args[0])
         self.image = load_image(f'{item_name}.png', f'Sprites/Items')
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = 218 + 48 * self.pos, 758
@@ -132,6 +137,8 @@ class Item(pygame.sprite.Sprite):
         game.camera.appply(point)
         used_tile = pygame.sprite.spritecollide(point, game.all_sprites, False)
         if used_tile:
+            if len(used_tile) > 3:
+                used_tile[3].update()
             if self.name == 'wood_shovel':
                 used_tile[1].update('uws')
             elif self.name == 'wood_hoe':
@@ -145,6 +152,12 @@ class Item(pygame.sprite.Sprite):
             elif self.name == 'Ir_Axe':
                 used_tile[1].update('uira')
         point.kill()
+
+    def c_draw(self, screen):
+        if self.name == 'Wood' and self.count > 1:
+            font = pygame.font.SysFont('Times New Roman', 15)
+            text = font.render(str(self.count), False, (0, 0, 0))
+            screen.blit(text, (self.rect.x + 25, self.rect.y + 20))
 
 
 class MyPoint(pygame.sprite.Sprite):
@@ -170,7 +183,10 @@ class Inventory(pygame.sprite.Sprite):
         with open(file, mode='r', encoding='utf-8') as inventory_file:
             item_lines = list(map(str.rstrip, inventory_file.readlines()))
             for i in range(len(item_lines)):
-                self.items.append(Item(item_lines[i], i))
+                if item_lines[i].split()[0] in MI_LIST:
+                    self.items.append(Item(item_lines[i].split()[0], i, item_lines[i].split()[1]))
+                else:
+                    self.items.append(Item(item_lines[i], i))
         self.choosed = 1
         self.image = load_image('InvC1.png', 'Sprites/Inv')
         self.rect = self.image.get_rect()
@@ -216,6 +232,20 @@ class Inventory(pygame.sprite.Sprite):
         elif arg == '12':
             self.image = load_image('InvC12.png', 'Sprites/Inv')
             self.choosed = 12
+
+    def add_item(self, name, *args):
+        for i in range(len(self.items)):
+            if self.items[i].name == name and name in MI_LIST:
+                self.items[i].count += int(args[0])
+                return True
+        for i in range(len(self.items)):
+            if self.items[i].name == 'None':
+                self.items[i] = Item(name, i, args[0])
+                return True
+        return False
+
+    def move_item(self, p1, p2):
+        self.items[p1], self.items[p2] = self.items[p2], self.items[p1]
 
 
 class EnergyBar(pygame.sprite.Sprite):
@@ -504,6 +534,34 @@ class InHomeFonBorders(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = 350, 139
 
 
+class CellBox(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(game.all_sprites, game.tile_group, game.d_mask_group)
+        self.image = load_image('Mask_Box.png', 'Sprites/Home')
+        self.mask = pygame.mask.from_surface(self.image)
+        self.image = load_image('Box.png', 'Sprites/Home')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 1020, 500
+        self.m = 0
+
+    def update(self):
+        iname = game.character.inv.items[game.character.inv.choosed - 1].name
+        if iname != 'None':
+            if iname == 'Axe':
+                self.m += 15
+            elif iname == 'Iron_Axe':
+                self.m += 150
+            elif iname == 'Gold_Axe':
+                self.m += 450
+            elif iname == 'Ir_Axe':
+                self.m += 900
+            elif iname == 'Wood':
+                self.m += 2 * game.character.inv.items[game.character.inv.choosed - 1].count
+            game.character.inv.items[game.character.inv.choosed - 1].kill()
+            game.character.inv.items[game.character.inv.choosed - 1] = \
+                Item('None', game.character.inv.choosed - 1)
+
+
 class Game:
     def __init__(self, save):
         self.save = save
@@ -512,6 +570,7 @@ class Game:
         self.game_clock.days += 1
         self.game_clock.hours = 4
         self.game_clock.minuts = 0
+
         old_map = load_map(f'Saves/Save{self.save}/Map.txt')[0]
         for tile in self.map_tile_group:
             old_map[tile.y][tile.x] = ';'.join(tile.tile)
@@ -522,9 +581,19 @@ class Game:
         with open(f'Saves/Save{self.save}/Save.txt', mode='r', encoding='utf-8') as save_file:
             old_save = save_file.readlines()
         old_save[2] = str(self.game_clock.days) + '\n'
-        old_save[3] = str(self.money.m) + '\n'
+        old_save[3] = str(self.money.m + self.cell_box.m) + '\n'
+        self.money.m += self.cell_box.m
+        self.cell_box.m = 0
         with open(f'Saves/Save{self.save}/Save.txt', mode='w', encoding='utf-8') as save_file:
             save_file.writelines(''.join(old_save))
+        new_inv = []
+        for e in self.character.inv.items:
+            if e.name in MI_LIST:
+                new_inv.append(e.name + ' ' + str(e.count))
+            else:
+                new_inv.append(e.name)
+        with open(f'Saves/Save{self.save}/Inv.txt', mode='w', encoding='utf-8') as inv_file:
+            inv_file.writelines('\n'.join(new_inv))
             print(old_save)
         if self.run_type == 'home':
             self.character.rect.x, self.character.rect.y = 382, 275
@@ -591,6 +660,8 @@ class Game:
                 self.hero_group.draw(self.screen)
                 self.walked_group.draw(self.screen)
                 self.menu_group.draw(self.screen)
+                for e in self.character.inv.items:
+                    e.c_draw(self.screen)
                 self.game_clock.draw_time(self.screen)
                 self.money.print_money(self.screen)
                 pygame.display.flip()
@@ -671,6 +742,7 @@ class Game:
         self.money = Money(data_lines[3])
         self.time_update = pygame.USEREVENT + 1
         self.home = Home()
+        self.cell_box = CellBox()
         pygame.time.set_timer(self.time_update, 3500)
 
 

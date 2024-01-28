@@ -1,7 +1,7 @@
-Axe
 None
 None
-Gold_Axe
+None
+None
 None
 wood_hoe
 wood_shovel
