@@ -4,8 +4,8 @@ import os
 
 FPS = 30
 small_grow_tile = []
+long_grow_tile = []
 MI_LIST = ['Wood']
-
 
 
 def load_image(name, road, colorkey=None):
@@ -55,21 +55,31 @@ class Tile(pygame.sprite.Sprite):
             self.rect.x, self.rect.y = 25 * pos_x + 80 - 35, 25 * pos_y + 80 - 30
             self.sub = SubTile(25 * pos_x + 80 - 35, 25 * pos_y + 80 - 30, 'td')
             self.hp = 15
+        elif self.tile[0] == 'Gradka':
+            super().__init__(game.all_sprites, game.tile_group, game.map_tile_group, game.g_group)
+            self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
+            long_grow_tile.append([self, int(self.tile[2])])
 
     def update(self, arg):
         if (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
-                self.tile[0] == 'Gradka') and arg == 'uws':
+                self.tile[0] == 'Gradka') and arg == 'us':
             self.tile[0] = 'Zemla'
             self.image = load_image('Zemla.jpg', 'Sprites')
             small_grow_tile.append([self, 6])
         elif self.tile[0] == 'Zemla' and arg == 'sge':
             self.tile[0] = 'Grass'
             self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
+        elif self.tile[0] == 'Gradka' and arg == 'lge':
+            self.tile[0] = 'Grass'
+            self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
         elif (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
-                self.tile[0] == 'Gradka') and arg == 'uwh':
+                self.tile[0] == 'Gradka') and arg == 'uh':
             self.tile[0] = 'Gradka'
+            self.tile[2] = 4
+            long_grow_tile.append([self, 4])
             self.image = load_image('Gradka.jpg', 'Sprites')
-            small_grow_tile.append([self, 24])
         elif self.tile[0] == 'Tree':
             if arg == 'ua':
                 self.hp -= 1
@@ -139,18 +149,33 @@ class Item(pygame.sprite.Sprite):
         if used_tile:
             if len(used_tile) > 3:
                 used_tile[3].update()
-            if self.name == 'wood_shovel':
-                used_tile[1].update('uws')
-            elif self.name == 'wood_hoe':
-                used_tile[1].update('uwh')
-            elif self.name == 'Axe':
-                used_tile[1].update('ua')
-            elif self.name == 'Iron_Axe':
-                used_tile[1].update('uia')
-            elif self.name == 'Gold_Axe':
-                used_tile[1].update('uga')
-            elif self.name == 'Ir_Axe':
-                used_tile[1].update('uira')
+            elif game.character.enb.enable():
+                if self.name == 'Shovel':
+                    used_tile[1].update('us')
+                elif self.name == 'Axe':
+                    game.character.enb.energy -= 1
+                    used_tile[1].update('ua')
+                elif self.name == 'Iron_Axe':
+                    game.character.enb.energy -= 1
+                    used_tile[1].update('uia')
+                elif self.name == 'Gold_Axe':
+                    game.character.enb.energy -= 1
+                    used_tile[1].update('uga')
+                elif self.name == 'Ir_Axe':
+                    game.character.enb.energy -= 1
+                    used_tile[1].update('uira')
+                elif self.name == 'Hoe':
+                    game.character.enb.energy -= 5
+                    used_tile[1].update('uh')
+                elif self.name == 'Iron_Hoe':
+                    game.character.enb.energy -= 3
+                    used_tile[1].update('uh')
+                elif self.name == 'Gold_Hoe':
+                    game.character.enb.energy -= 2
+                    used_tile[1].update('uh')
+                elif self.name == 'Ir_Hoe':
+                    game.character.enb.energy -= 1
+                    used_tile[1].update('uh')
         point.kill()
 
     def c_draw(self, screen):
@@ -262,7 +287,6 @@ class EnergyBar(pygame.sprite.Sprite):
         return False
 
     def update(self):
-        self.energy -= 1
         if self.energy > 24:
             self.image = load_image('EnergyBar4.png', 'Sprites/EnergyBar')
         elif 15 <= self.energy < 25:
@@ -334,7 +358,6 @@ class Hero(pygame.sprite.Sprite):
         elif arg == 'da' and self.enb.enable():
             self.inv.update('da')
             self.enb.update()
-        print(self.rect.x, self.rect.y, '----', self.absolute_x, self.absolute_y)
         if pygame.sprite.spritecollideany(self.boots, game.home_t_group):
             game.run_type = 'home'
             self.rect.x, self.rect.y = 421, 380
@@ -570,6 +593,16 @@ class Game:
         self.game_clock.days += 1
         self.game_clock.hours = 4
         self.game_clock.minuts = 0
+        for i in range(len(long_grow_tile)):
+            if long_grow_tile[i][1] < 1:
+                long_grow_tile[i][0].update('lge')
+                long_grow_tile[i][0].tile[2] = '0'
+            else:
+                long_grow_tile[i][0].tile[2] = str(int(long_grow_tile[i][0].tile[2]) - 1)
+                long_grow_tile[i][1] -= 1
+        for t in small_grow_tile:
+            t[0].update('sge')
+
 
         old_map = load_map(f'Saves/Save{self.save}/Map.txt')[0]
         for tile in self.map_tile_group:

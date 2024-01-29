@@ -1,10 +1,10 @@
 None
+Axe
 None
 None
-None
-None
-wood_hoe
-wood_shovel
+Hoe
+Ir_Hoe
+Shovel
 Iron_Axe
 Ir_Axe
 None
