@@ -33,9 +33,9 @@ class Tile(pygame.sprite.Sprite):
             self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
         elif self.tile[0] == 'Water':
             super().__init__(game.all_sprites, game.tile_group, game.d_group, game.map_tile_group)
-            self.image = load_image(f'Water_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Water')
+            self.image = load_image(f'Water_{self.tile[2] + self.tile[1]}.png', 'Sprites/Water')
             self.rect = self.image.get_rect()
-            self.rect.x, self.rect.y = 25 * pos_x + 80, 25 * pos_y + 80
+            self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
         elif self.tile[0] == 'Stump':
             super().__init__(game.all_sprites, game.tile_group,
                              game.d_mask_group, game.map_tile_group)
@@ -44,7 +44,7 @@ class Tile(pygame.sprite.Sprite):
             self.image = load_image(f'Stump.png', 'Sprites/Wood')
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
-            self.hp = 10
+            self.hp = 5
         elif self.tile[0] == 'Tree':
             super().__init__(game.all_sprites, game.tile_group,
                              game.d_mask_group, game.walked_group, game.map_tile_group)
@@ -61,6 +61,7 @@ class Tile(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
             long_grow_tile.append([self, int(self.tile[2])])
+            self.p = 0
 
     def update(self, arg):
         if (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
@@ -77,9 +78,10 @@ class Tile(pygame.sprite.Sprite):
         elif (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
                 self.tile[0] == 'Gradka') and arg == 'uh':
             self.tile[0] = 'Gradka'
-            self.tile[2] = 4
+            self.p = 0
+            self.tile[2] = '4'
             long_grow_tile.append([self, 4])
-            self.image = load_image('Gradka.jpg', 'Sprites')
+            self.image = load_image('Gradka.png', 'Sprites/Farm')
         elif self.tile[0] == 'Tree':
             if arg == 'ua':
                 self.hp -= 1
@@ -103,6 +105,28 @@ class Tile(pygame.sprite.Sprite):
                 self.rect.x, self.rect.y = x + 30,  y + 90
                 self.hp = 10
                 game.character.inv.add_item('Wood', 15)
+        elif self.tile[0] == 'Stump' and (arg == 'ua' or arg == 'uia' or arg == 'uga' or
+                arg == 'uira'):
+            self.hp -= 1
+            if self.hp < 1:
+                x, y = self.rect.x, self.rect.y
+                self.kill()
+                super().__init__(game.all_sprites, game.tile_group, game.map_tile_group)
+                self.tile[0] = 'Grass'
+                self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
+                self.rect = self.image.get_rect()
+                self.rect.x, self.rect.y = x, y
+                game.character.inv.add_item('Wood', 5)
+
+        elif self.tile[0] == 'Water' and arg == 'ucv':
+            return True
+        elif self.tile[0] == 'Gradka' and arg == 'uc':
+            self.p = 1
+            self.image = load_image('Gradka_w.png', 'Sprites/Farm')
+        elif self.tile[0] == 'Gradka' and arg == 'so':
+            self.p = 0
+            self.image = load_image('Gradka.png', 'Sprites/Farm')
+        return False
 
 
 class SubTile(pygame.sprite.Sprite):
@@ -138,7 +162,12 @@ class Item(pygame.sprite.Sprite):
         self.name, self.pos = item_name, pos
         if self.name == 'Wood':
             self.count = int(args[0])
-        self.image = load_image(f'{item_name}.png', f'Sprites/Items')
+        if self.name == 'Can' or self.name == 'Iron_Can' or \
+                self.name == 'Gold_Can' or self.name == 'Ir_Can':
+            self.image = load_image(f'{item_name}_1.png', f'Sprites/Items')
+            self.capasity = 0
+        else:
+            self.image = load_image(f'{item_name}.png', f'Sprites/Items')
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = 218 + 48 * self.pos, 758
 
@@ -148,8 +177,10 @@ class Item(pygame.sprite.Sprite):
         used_tile = pygame.sprite.spritecollide(point, game.all_sprites, False)
         if used_tile:
             if len(used_tile) > 3:
-                used_tile[3].update()
-            elif game.character.enb.enable():
+                if str(type(used_tile[3])) == "<class '__main__.CellBox'>":
+                    used_tile[3].update()
+                    return
+            if game.character.enb.enable():
                 if self.name == 'Shovel':
                     used_tile[1].update('us')
                 elif self.name == 'Axe':
@@ -176,6 +207,62 @@ class Item(pygame.sprite.Sprite):
                 elif self.name == 'Ir_Hoe':
                     game.character.enb.energy -= 1
                     used_tile[1].update('uh')
+                elif self.name == 'Can':
+                    if used_tile[1].update('ucv'):
+                        self.capasity = 5
+                        game.character.enb.energy -= 1
+                    elif self.capasity > 0:
+                        self.capasity -= 1
+                        used_tile[1].update('uc')
+                elif self.name == 'Iron_Can':
+                    if used_tile[1].update('ucv'):
+                        self.capasity = 15
+                        game.character.enb.energy -= 1
+                    elif self.capasity > 0:
+                        self.capasity -= 1
+                        used_tile[1].update('uc')
+                elif self.name == 'Gold_Can':
+                    if used_tile[1].update('ucv'):
+                        self.capasity = 30
+                        game.character.enb.energy -= 1
+                    elif self.capasity > 0:
+                        self.capasity -= 1
+                        used_tile[1].update('uc')
+                elif self.name == 'Ir_Can':
+                    if used_tile[1].update('ucv'):
+                        self.capasity = 60
+                        game.character.enb.energy -= 1
+                    elif self.capasity > 0:
+                        self.capasity -= 1
+                        used_tile[1].update('uc')
+                if self.name == 'Can':
+                    if self.capasity > 4:
+                        self.image = load_image('Can_3.png', 'Sprites/Items')
+                    elif self.capasity > 1:
+                        self.image = load_image('Can_2.png', 'Sprites/Items')
+                    else:
+                        self.image = load_image('Can_1.png', 'Sprites/Items')
+                elif self.name == 'Iron_Can':
+                    if self.capasity > 10:
+                        self.image = load_image('Iron_Can_3.png', 'Sprites/Items')
+                    elif self.capasity > 5:
+                        self.image = load_image('Iron_Can_2.png', 'Sprites/Items')
+                    else:
+                        self.image = load_image('Iron_Can_1.png', 'Sprites/Items')
+                elif self.name == 'Gold_Can':
+                    if self.capasity > 19:
+                        self.image = load_image('Gold_Can_3.png', 'Sprites/Items')
+                    elif self.capasity > 9:
+                        self.image = load_image('Gold_Can_2.png', 'Sprites/Items')
+                    else:
+                        self.image = load_image('Gold_Can_1.png', 'Sprites/Items')
+                elif self.name == 'Ir_Can':
+                    if self.capasity > 39:
+                        self.image = load_image('Ir_Can_3.png', 'Sprites/Items')
+                    elif self.capasity > 19:
+                        self.image = load_image('Ir_Can_2.png', 'Sprites/Items')
+                    else:
+                        self.image = load_image('Ir_Can_1.png', 'Sprites/Items')
         point.kill()
 
     def c_draw(self, screen):
@@ -580,6 +667,24 @@ class CellBox(pygame.sprite.Sprite):
                 self.m += 900
             elif iname == 'Wood':
                 self.m += 2 * game.character.inv.items[game.character.inv.choosed - 1].count
+            elif iname == 'Hoe':
+                self.m += 15
+            elif iname == 'Iron_Hoe':
+                self.m += 150
+            elif iname == 'Gold_Hoe':
+                self.m += 450
+            elif iname == 'Ir_Hoe':
+                self.m += 900
+            elif iname == 'Shovel':
+                self.m += 45
+            elif iname == 'Can':
+                self.m += 15
+            elif iname == 'Iron_Can':
+                self.m += 150
+            elif iname == 'Gold_Can':
+                self.m += 450
+            elif iname == 'Ir_Can':
+                self.m += 900
             game.character.inv.items[game.character.inv.choosed - 1].kill()
             game.character.inv.items[game.character.inv.choosed - 1] = \
                 Item('None', game.character.inv.choosed - 1)
@@ -594,7 +699,9 @@ class Game:
         self.game_clock.hours = 4
         self.game_clock.minuts = 0
         for i in range(len(long_grow_tile)):
-            if long_grow_tile[i][1] < 1:
+            if long_grow_tile[i][0].p == 1:
+                long_grow_tile[i][0].update('so')
+            elif long_grow_tile[i][1] < 1:
                 long_grow_tile[i][0].update('lge')
                 long_grow_tile[i][0].tile[2] = '0'
             else:
@@ -627,7 +734,6 @@ class Game:
                 new_inv.append(e.name)
         with open(f'Saves/Save{self.save}/Inv.txt', mode='w', encoding='utf-8') as inv_file:
             inv_file.writelines('\n'.join(new_inv))
-            print(old_save)
         if self.run_type == 'home':
             self.character.rect.x, self.character.rect.y = 382, 275
             self.character.enb.energy = 36
@@ -724,14 +830,13 @@ class Game:
                     self.character.boots.update(self.character)
                     if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
                         self.character.rect.y -= 1
-                    print(self.character.boots.rect.x, self.character.boots.rect.y)
                 if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_d]:
                     self.character.ori = 'r'
                     self.character.rect.x += 1
                     self.character.boots.update(self.character)
                     if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
                         self.character.rect.x -= 1
-                self.screen.fill('white')
+                self.screen.fill('black')
                 self.all_home_sprites.draw(self.screen)
                 self.hero_group.draw(self.screen)
                 self.moved_home_sprites.draw(self.screen)
