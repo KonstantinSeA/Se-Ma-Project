@@ -1061,6 +1061,8 @@ class Game:
                         self.character.inv.update('12')
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_u:
                         self.hero_group.update('5')
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        sys.exit()
                     if event.type == game.time_update:
                         self.game_clock.time_update()
                 if pygame.key.get_pressed()[pygame.K_UP] or pygame.key.get_pressed()[pygame.K_w]:
@@ -1094,6 +1096,8 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.running = False
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        sys.exit()
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_e and \
                             586 < self.character.rect.x and 357 < self.character.rect.y:
                         self.next_day()
@@ -1139,6 +1143,8 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.running = False
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        sys.exit()
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                         self.run_type = 'farm'
                     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -1188,5 +1194,3 @@ class Game:
 
 
 game = Game('a')
-game.init()
-game.run()

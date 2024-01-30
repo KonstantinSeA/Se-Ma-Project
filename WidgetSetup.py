@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLa
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5 import uic
 
+from plays import game
+
 
 class StartedMenu(QWidget):
     def __init__(self):
@@ -23,7 +25,9 @@ class StartedMenu(QWidget):
 
     def run_play(self):
         self.hide()
-        print('Run a Save')
+        game.init()
+        game.run()
+        sys.exit()
 
     def run_save(self):
         self.save_menu = SavesMenu(self)
@@ -99,10 +103,14 @@ class GameMenu(QWidget):
 
     def run_play(self):
         self.hide()
-        print(f'Run {self.save} Save')
+        game.save = self.save
+        game.init()
+        game.run()
+        sys.exit()
 
     def run_reset(self):
-        print(f'Run {self.save} Reset')
+        game.save = self.save
+        game.reset()
 
     def run_exit(self):
         self.hide()
