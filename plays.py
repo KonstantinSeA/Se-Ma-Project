@@ -1,3 +1,4 @@
+import random
 import sys
 import pygame
 import os
@@ -5,7 +6,8 @@ import os
 FPS = 30
 small_grow_tile = []
 long_grow_tile = []
-MI_LIST = ['Wood']
+MI_LIST = ['Wood', 'Pumpkin', 'Pumpkin_Seeds', 'Tomato', 'Tomato_Seeds', 'Pepper', 'Pepper_Seeds',
+           'Baklajan', 'Baklajan_Seeds', 'Wheat', 'Wheat_Seeds']
 
 
 def load_image(name, road, colorkey=None):
@@ -62,6 +64,41 @@ class Tile(pygame.sprite.Sprite):
             self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
             long_grow_tile.append([self, int(self.tile[2])])
             self.p = 0
+        elif self.tile[0] == 'Gp':
+            super().__init__(game.all_sprites, game.tile_group, game.map_tile_group)
+            self.image = load_image(f'Gp{self.tile[1]}.png', 'Sprites/Farm')
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
+            long_grow_tile.append([self, int(self.tile[2])])
+            self.p = 0
+        elif self.tile[0] == 'Gt':
+            super().__init__(game.all_sprites, game.tile_group, game.map_tile_group)
+            self.image = load_image(f'Gt{self.tile[1]}.png', 'Sprites/Farm')
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
+            long_grow_tile.append([self, int(self.tile[2])])
+            self.p = 0
+        elif self.tile[0] == 'Gpe':
+            super().__init__(game.all_sprites, game.tile_group, game.map_tile_group)
+            self.image = load_image(f'Gpe{self.tile[1]}.png', 'Sprites/Farm')
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
+            long_grow_tile.append([self, int(self.tile[2])])
+            self.p = 0
+        elif self.tile[0] == 'Gb':
+            super().__init__(game.all_sprites, game.tile_group, game.map_tile_group)
+            self.image = load_image(f'Gb{self.tile[1]}.png', 'Sprites/Farm')
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
+            long_grow_tile.append([self, int(self.tile[2])])
+            self.p = 0
+        elif self.tile[0] == 'Gw':
+            super().__init__(game.all_sprites, game.tile_group, game.map_tile_group)
+            self.image = load_image(f'Gw{self.tile[1]}.png', 'Sprites/Farm')
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = 25 * pos_x + 75, 25 * pos_y + 140
+            long_grow_tile.append([self, int(self.tile[2])])
+            self.p = 0
 
     def update(self, arg):
         if (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
@@ -73,7 +110,8 @@ class Tile(pygame.sprite.Sprite):
             self.tile[0] = 'Grass'
             self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
         elif self.tile[0] == 'Gradka' and arg == 'lge':
-            self.tile[0] = 'Grass'
+            self.tile[0], self.tile[1], self.tile[2] = 'Grass', '0', '0'
+
             self.image = load_image(f'Grass_{self.tile[2] + self.tile[1]}.jpg', 'Sprites/Grass')
         elif (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
                 self.tile[0] == 'Gradka') and arg == 'uh':
@@ -122,10 +160,96 @@ class Tile(pygame.sprite.Sprite):
             return True
         elif self.tile[0] == 'Gradka' and arg == 'uc':
             self.p = 1
-            self.image = load_image('Gradka_w.png', 'Sprites/Farm')
+            self.image = load_image(f'Gradka_w.png', 'Sprites/Farm')
         elif self.tile[0] == 'Gradka' and arg == 'so':
             self.p = 0
             self.image = load_image('Gradka.png', 'Sprites/Farm')
+        elif self.tile[0] == 'Gradka' and arg == 'ups':
+            self.tile[0] = 'Gp'
+            self.tile[1] = '1'
+            if self.p == 0:
+                self.image = load_image(f'GP1.png', 'Sprites/Farm')
+            else:
+                self.image = load_image(f'GP1_w.png', 'Sprites/Farm')
+        elif self.tile[0] == 'Gradka' and arg == 'uts':
+            self.tile[0] = 'Gt'
+            self.tile[1] = '1'
+            if self.p == 0:
+                self.image = load_image(f'Gt1.png', 'Sprites/Farm')
+            else:
+                self.image = load_image(f'Gt1_w.png', 'Sprites/Farm')
+        elif self.tile[0] == 'Gradka' and arg == 'upes':
+            self.tile[0] = 'Gpe'
+            self.tile[1] = '1'
+            if self.p == 0:
+                self.image = load_image(f'Gpe1.png', 'Sprites/Farm')
+            else:
+                self.image = load_image(f'Gpe1_w.png', 'Sprites/Farm')
+        elif self.tile[0] == 'Gradka' and arg == 'ubs':
+            self.tile[0] = 'Gb'
+            self.tile[1] = '1'
+            if self.p == 0:
+                self.image = load_image(f'Gb1.png', 'Sprites/Farm')
+            else:
+                self.image = load_image(f'Gb1_w.png', 'Sprites/Farm')
+        elif self.tile[0] == 'Gradka' and arg == 'uws':
+            self.tile[0] = 'Gw'
+            self.tile[1] = '1'
+            if self.p == 0:
+                self.image = load_image(f'Gw1.png', 'Sprites/Farm')
+            else:
+                self.image = load_image(f'Gw1_w.png', 'Sprites/Farm')
+        elif (self.tile[0] == 'Gp' or self.tile[0] == 'Gt' or self.tile[0] == 'Gpe' or
+              self.tile[0] == 'Gb' or self.tile[0] == 'Gw') and arg == 'uc':
+            self.p = 1
+            self.image = load_image(f'{self.tile[0] + self.tile[1]}_w.png', 'Sprites/Farm')
+        elif (self.tile[0] == 'Gp' or self.tile[0] == 'Gt' or self.tile[0] == 'Gpe' or
+              self.tile[0] == 'Gb' or self.tile[0] == 'Gw') and arg == 'so':
+            self.p = 0
+            if (self.tile[0] == 'Gp' and self.tile[1] != '5' or
+                    self.tile[0] == 'Gt' and self.tile[1] != '3' or
+                    self.tile[0] == 'Gpe' and self.tile[1] != '6' or
+                    self.tile[0] == 'Gb' and self.tile[1] != '5' or
+                    self.tile[0] == 'Gw' and self.tile[1] != '4'):
+                self.tile[1] = str(int(self.tile[1]) + 1)
+            self.image = load_image(f'{self.tile[0] + self.tile[1]}.png', 'Sprites/Farm')
+        elif (self.tile[0] == 'Gp' or self.tile[0] == 'Gt' or self.tile[0] == 'Gpe' or
+              self.tile[0] == 'Gb' or self.tile[0] == 'Gw') and arg == 'uh':
+            if self.tile[0] == 'Gp' and self.tile[1] == '5':
+                self.tile[0], self.tile[1], self.tile[2] = 'Gradka', '0', '4'
+                if self.p == 0:
+                    self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+                else:
+                    self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+                game.character.inv.add_item('Pumpkin', 1)
+            elif self.tile[0] == 'Gt' and self.tile[1] == '3':
+                self.tile[0], self.tile[1], self.tile[2] = 'Gradka', '0', '4'
+                if self.p == 0:
+                    self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+                else:
+                    self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+                game.character.inv.add_item('Tomato', random.randrange(1, 6))
+            elif self.tile[0] == 'Gpe' and self.tile[1] == '6':
+                self.tile[0], self.tile[1], self.tile[2] = 'Gradka', '0', '4'
+                if self.p == 0:
+                    self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+                else:
+                    self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+                game.character.inv.add_item('Pepper', 1)
+            elif self.tile[0] == 'Gb' and self.tile[1] == '5':
+                self.tile[0], self.tile[1], self.tile[2] = 'Gradka', '0', '4'
+                if self.p == 0:
+                    self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+                else:
+                    self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+                game.character.inv.add_item('Baklajan', 1)
+            elif self.tile[0] == 'Gw' and self.tile[1] == '4':
+                self.tile[0], self.tile[1], self.tile[2] = 'Gradka', '0', '4'
+                if self.p == 0:
+                    self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+                else:
+                    self.image = load_image(f'Gradka.png', 'Sprites/Farm')
+                game.character.inv.add_item('Wheat', random.randrange(1, 5))
         return False
 
 
@@ -160,7 +284,7 @@ class Item(pygame.sprite.Sprite):
     def __init__(self, item_name, pos, *args):
         super().__init__(game.all_sprites, game.menu_group)
         self.name, self.pos = item_name, pos
-        if self.name == 'Wood':
+        if self.name in MI_LIST:
             self.count = int(args[0])
         if self.name == 'Can' or self.name == 'Iron_Can' or \
                 self.name == 'Gold_Can' or self.name == 'Ir_Can':
@@ -235,6 +359,26 @@ class Item(pygame.sprite.Sprite):
                     elif self.capasity > 0:
                         self.capasity -= 1
                         used_tile[1].update('uc')
+                elif self.name == 'Pumpkin_Seeds':
+                    self.count -= 1
+                    game.character.enb.energy -= 1
+                    used_tile[1].update('ups')
+                elif self.name == 'Tomato_Seeds':
+                    self.count -= 1
+                    game.character.enb.energy -= 1
+                    used_tile[1].update('uts')
+                elif self.name == 'Pepper_Seeds':
+                    self.count -= 1
+                    game.character.enb.energy -= 1
+                    used_tile[1].update('upes')
+                elif self.name == 'Baklajan_Seeds':
+                    self.count -= 1
+                    game.character.enb.energy -= 1
+                    used_tile[1].update('ubs')
+                elif self.name == 'Wheat_Seeds':
+                    self.count -= 1
+                    game.character.enb.energy -= 1
+                    used_tile[1].update('uws')
                 if self.name == 'Can':
                     if self.capasity > 4:
                         self.image = load_image('Can_3.png', 'Sprites/Items')
@@ -263,10 +407,14 @@ class Item(pygame.sprite.Sprite):
                         self.image = load_image('Ir_Can_2.png', 'Sprites/Items')
                     else:
                         self.image = load_image('Ir_Can_1.png', 'Sprites/Items')
+                if self.name in MI_LIST:
+                    if self.count < 1:
+                        self.name = 'None'
+                        self.image = self.image = load_image('None.png', 'Sprites/Items')
         point.kill()
 
     def c_draw(self, screen):
-        if self.name == 'Wood' and self.count > 1:
+        if self.name in MI_LIST and self.count > 1:
             font = pygame.font.SysFont('Times New Roman', 15)
             text = font.render(str(self.count), False, (0, 0, 0))
             screen.blit(text, (self.rect.x + 25, self.rect.y + 20))
@@ -685,6 +833,26 @@ class CellBox(pygame.sprite.Sprite):
                 self.m += 450
             elif iname == 'Ir_Can':
                 self.m += 900
+            elif iname == 'Pumpkin':
+                self.m += 45 * game.character.inv.items[game.character.inv.choosed - 1].count
+            elif iname == 'Pumpkin_Seeds':
+                self.m += 5 * game.character.inv.items[game.character.inv.choosed - 1].count
+            elif iname == 'Tomato':
+                self.m += 5 * game.character.inv.items[game.character.inv.choosed - 1].count
+            elif iname == 'Tomato_Seeds':
+                self.m += 4 * game.character.inv.items[game.character.inv.choosed - 1].count
+            elif iname == 'Pepper':
+                self.m += 150 * game.character.inv.items[game.character.inv.choosed - 1].count
+            elif iname == 'Pepper_Seeds':
+                self.m += 6 * game.character.inv.items[game.character.inv.choosed - 1].count
+            elif iname == 'Baklajan':
+                self.m += 90 * game.character.inv.items[game.character.inv.choosed - 1].count
+            elif iname == 'Baklajan_Seeds':
+                self.m += 5 * game.character.inv.items[game.character.inv.choosed - 1].count
+            elif iname == 'Wheat':
+                self.m += 8 * game.character.inv.items[game.character.inv.choosed - 1].count
+            elif iname == 'Wheat_Seeds':
+                self.m += 4 * game.character.inv.items[game.character.inv.choosed - 1].count
             game.character.inv.items[game.character.inv.choosed - 1].kill()
             game.character.inv.items[game.character.inv.choosed - 1] = \
                 Item('None', game.character.inv.choosed - 1)
