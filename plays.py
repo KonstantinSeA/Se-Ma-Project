@@ -516,7 +516,7 @@ class Inventory(pygame.sprite.Sprite):
 class EnergyBar(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(game.all_sprites, game.menu_group)
-        self.energy = 35
+        self.energy = 70
         self.image = load_image('EnergyBar4.png', 'Sprites/EnergyBar')
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = 940, 500
@@ -527,13 +527,13 @@ class EnergyBar(pygame.sprite.Sprite):
         return False
 
     def update(self):
-        if self.energy > 24:
+        if self.energy > 55:
             self.image = load_image('EnergyBar4.png', 'Sprites/EnergyBar')
-        elif 15 <= self.energy < 25:
+        elif 15 <= self.energy < 44:
             self.image = load_image('EnergyBar3.png', 'Sprites/EnergyBar')
-        elif 5 <= self.energy < 15:
+        elif 5 <= self.energy < 24:
             self.image = load_image('EnergyBar2.png', 'Sprites/EnergyBar')
-        elif self.energy < 5:
+        elif self.energy < 9:
             self.image = load_image('EnergyBar1.png', 'Sprites/EnergyBar')
 
 
@@ -1007,7 +1007,7 @@ class Game:
             inv_file.writelines('\n'.join(new_inv))
         if self.run_type == 'home':
             self.character.rect.x, self.character.rect.y = 382, 275
-            self.character.enb.energy = 36
+            self.character.enb.energy = 76
             self.character.enb.update()
         else:
             self.character.enb.energy = 16
@@ -1188,5 +1188,3 @@ class Game:
 
 
 game = Game('a')
-game.init()
-game.run()
