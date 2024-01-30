@@ -103,7 +103,7 @@ class Tile(pygame.sprite.Sprite):
     def update(self, arg):
         if (self.tile[0] == 'Grass' or self.tile[0] == 'Zemla' or
                 self.tile[0] == 'Gradka') and arg == 'us':
-            self.tile[0] = 'Zemla'
+            self.tile[0], self.tile[1], self.tile[2] = 'Zemla', '0', '0'
             self.image = load_image('Zemla.jpg', 'Sprites')
             small_grow_tile.append([self, 6])
         elif self.tile[0] == 'Zemla' and arg == 'sge':
@@ -305,7 +305,9 @@ class Item(pygame.sprite.Sprite):
                     used_tile[3].update()
                     return
             if game.character.enb.enable():
-                if self.name == 'Shovel':
+                if self.name == 'None':
+                    used_tile[1].update('un')
+                elif self.name == 'Shovel':
                     used_tile[1].update('us')
                 elif self.name == 'Axe':
                     game.character.enb.energy -= 1
@@ -500,7 +502,10 @@ class Inventory(pygame.sprite.Sprite):
                 return True
         for i in range(len(self.items)):
             if self.items[i].name == 'None':
-                self.items[i] = Item(name, i, args[0])
+                if args:
+                    self.items[i] = Item(name, i, args[0])
+                else:
+                    self.items[i] = Item(name, i)
                 return True
         return False
 
@@ -533,13 +538,10 @@ class EnergyBar(pygame.sprite.Sprite):
 
 
 class Hero(pygame.sprite.Sprite):
-    def __init__(self, v, inv):
+    def __init__(self, inv):
         super().__init__(game.all_sprites, game.hero_group)
         self.image = pygame.Surface((20, 45), pygame.SRCALPHA, 32)
-        if v == 0:
-            self.image = load_image('Character_00.png', 'Sprites/Hero/Character')
-        elif v == 1:
-            pygame.draw.rect(self.image, pygame.Color('magenta'), (0, 0, 20, 45))
+        self.image = load_image('Character_0.png', 'Sprites/Hero')
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = 500, 400
         self.absolute_x, self.absolute_y = 500, 400
@@ -556,6 +558,7 @@ class Hero(pygame.sprite.Sprite):
                 m = 2
             if arg[1] == 'u':
                 self.ori = 'u'
+                self.image = load_image('Character_2.png', 'Sprites/Hero')
                 self.rect.y -= m
                 self.absolute_y -= m
                 self.boots.update(self)
@@ -565,6 +568,7 @@ class Hero(pygame.sprite.Sprite):
                     self.absolute_y += m
             elif arg[1] == 'l':
                 self.ori = 'l'
+                self.image = load_image('Character_3.png', 'Sprites/Hero')
                 self.rect.x -= m
                 self.absolute_x -= m
                 self.boots.update(self)
@@ -574,6 +578,7 @@ class Hero(pygame.sprite.Sprite):
                     self.absolute_x += m
             elif arg[1] == 'd':
                 self.ori = 'd'
+                self.image = load_image('Character_0.png', 'Sprites/Hero')
                 self.rect.y += m
                 self.absolute_y += m
                 self.boots.update(self)
@@ -583,6 +588,7 @@ class Hero(pygame.sprite.Sprite):
                     self.absolute_y -= m
             elif arg[1] == 'r':
                 self.ori = 'r'
+                self.image = load_image('Character_1.png', 'Sprites/Hero')
                 self.rect.x += m
                 self.absolute_x += m
                 self.boots.update(self)
@@ -591,8 +597,11 @@ class Hero(pygame.sprite.Sprite):
                     self.rect.x -= m
                     self.absolute_x -= m
         elif arg == 'da' and self.enb.enable():
-            self.inv.update('da')
-            self.enb.update()
+            if 700 < self.absolute_x < 850 and 50 < self.absolute_y < 125:
+                game.shop.go_shop()
+            else:
+                self.inv.update('da')
+                self.enb.update()
         if pygame.sprite.spritecollideany(self.boots, game.home_t_group):
             game.run_type = 'home'
             self.rect.x, self.rect.y = 421, 380
@@ -616,7 +625,7 @@ class HeroBoots(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, hero):
-        self.rect.x, self.rect.y = hero.rect.x, hero.rect.y + 30
+        self.rect.x, self.rect.y = hero.rect.x, hero.rect.y + 35
 
 
 class GameClock(pygame.sprite.Sprite):
@@ -858,6 +867,102 @@ class CellBox(pygame.sprite.Sprite):
                 Item('None', game.character.inv.choosed - 1)
 
 
+class Shop(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(game.all_sprites, game.tile_group, game.d_group)
+        self.image = load_image('Shop.png', 'Sprites/Hero')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 750, 75
+        self.fon = ShopFone()
+
+    def go_shop(self):
+        game.run_type = 'shop'
+
+    def deal(self, pos):
+        if 210 < pos[0] < 250 and 215 < pos[1] < 290:
+            if game.money.m > 29:
+                if game.character.inv.add_item('Axe'):
+                    game.money.m -= 30
+        elif 260 < pos[0] < 310 and 215 < pos[1] < 290:
+            if game.money.m > 29:
+                if game.character.inv.add_item('Hoe'):
+                    game.money.m -= 30
+        elif 320 < pos[0] < 380 and 215 < pos[1] < 290:
+            if game.money.m > 29:
+                if game.character.inv.add_item('Can'):
+                    game.money.m -= 30
+        elif 390 < pos[0] < 440 and 215 < pos[1] < 290:
+            if game.money.m > 299:
+                if game.character.inv.add_item('Iron_Axe'):
+                    game.money.m -= 300
+        elif 450 < pos[0] < 490 and 215 < pos[1] < 290:
+            if game.money.m > 299:
+                if game.character.inv.add_item('Iron_Hoe'):
+                    game.money.m -= 300
+        elif 500 < pos[0] < 540 and 215 < pos[1] < 290:
+            if game.money.m > 299:
+                if game.character.inv.add_item('Iron_Can'):
+                    game.money.m -= 300
+        elif 550 < pos[0] < 590 and 215 < pos[1] < 290:
+            if game.money.m > 899:
+                if game.character.inv.add_item('Gold_Axe'):
+                    game.money.m -= 900
+        elif 600 < pos[0] < 640 and 215 < pos[1] < 290:
+            if game.money.m > 899:
+                if game.character.inv.add_item('Gold_Hoe'):
+                    game.money.m -= 900
+        elif 650 < pos[0] < 690 and 215 < pos[1] < 290:
+            if game.money.m > 899:
+                if game.character.inv.add_item('Gold_Can'):
+                    game.money.m -= 900
+        elif 210 < pos[0] < 250 and 315 < pos[1] < 390:
+            if game.money.m > 1799:
+                if game.character.inv.add_item('Ir_Axe'):
+                    game.money.m -= 1800
+        elif 260 < pos[0] < 310 and 315 < pos[1] < 390:
+            if game.money.m > 1799:
+                if game.character.inv.add_item('Ir_Hoe'):
+                    game.money.m -= 1800
+        elif 320 < pos[0] < 380 and 315 < pos[1] < 390:
+            if game.money.m > 1799:
+                if game.character.inv.add_item('Ir_Can'):
+                    game.money.m -= 1800
+        elif 390 < pos[0] < 440 and 315 < pos[1] < 390:
+            if game.money.m > 89:
+                if game.character.inv.add_item('Shovel'):
+                    game.money.m -= 90
+        elif 450 < pos[0] < 490 and 315 < pos[1] < 390:
+            if game.money.m > 24:
+                if game.character.inv.add_item('Baklajan_Seeds', 1):
+                    game.money.m -= 25
+        elif 500 < pos[0] < 540 and 315 < pos[1] < 390:
+            if game.money.m > 4:
+                if game.character.inv.add_item('Wheat_Seeds', 1):
+                    game.money.m -= 5
+        elif 550 < pos[0] < 590 and 315 < pos[1] < 390:
+            if game.money.m > 3:
+                if game.character.inv.add_item('Tomato_Seeds', 1):
+                    game.money.m -= 4
+        elif 600 < pos[0] < 640 and 315 < pos[1] < 390:
+            if game.money.m > 4:
+                if game.character.inv.add_item('Pumpkin_Seeds', 1):
+                    game.money.m -= 5
+        elif 650 < pos[0] < 690 and 315 < pos[1] < 390:
+            if game.money.m > 39:
+                if game.character.inv.add_item('Pepper_Seeds', 1):
+                    game.money.m -= 40
+        elif 730 < pos[0] < 755 and 210 < pos[1] < 240:
+            game.run_type = 'farm'
+
+
+class ShopFone(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(game.shop_fone_group)
+        self.image = load_image('ShopMenu.png', 'Sprites')
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 200, 200
+
+
 class Game:
     def __init__(self, save):
         self.save = save
@@ -909,6 +1014,9 @@ class Game:
         else:
             self.character.enb.energy = 16
             self.character.enb.update()
+
+    def reset(self):
+        pass
 
     def run(self):
         while self.running:
@@ -982,24 +1090,28 @@ class Game:
                         self.next_day()
                 if pygame.key.get_pressed()[pygame.K_UP] or pygame.key.get_pressed()[pygame.K_w]:
                     self.character.ori = 'u'
+                    self.character.image = load_image('Character_2.png', 'Sprites/Hero')
                     self.character.rect.y -= 1
                     self.character.boots.update(self.character)
                     if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
                         self.character.rect.y += 1
                 if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]:
                     self.character.ori = 'l'
+                    self.character.image = load_image('Character_3.png', 'Sprites/Hero')
                     self.character.rect.x -= 1
                     self.character.boots.update(self.character)
                     if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
                         self.character.rect.x += 1
                 if pygame.key.get_pressed()[pygame.K_DOWN] or pygame.key.get_pressed()[pygame.K_s]:
                     self.character.ori = 'd'
+                    self.character.image = load_image('Character_0.png', 'Sprites/Hero')
                     self.character.rect.y += 1
                     self.character.boots.update(self.character)
                     if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
                         self.character.rect.y -= 1
                 if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_d]:
                     self.character.ori = 'r'
+                    self.character.image = load_image('Character_1.png', 'Sprites/Hero')
                     self.character.rect.x += 1
                     self.character.boots.update(self.character)
                     if pygame.sprite.collide_mask(self.character.boots, game.home.in_border):
@@ -1014,10 +1126,23 @@ class Game:
                     self.character.absolute_x, self.character.absolute_y = 910, 505
                 pygame.display.flip()
                 self.clock.tick(FPS)
+            elif self.run_type == 'shop':
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                        self.run_type = 'farm'
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        self.shop.deal(event.pos)
+                self.screen.fill('black')
+                self.shop_fone_group.draw(self.screen)
+                pygame.display.flip()
+                self.clock.tick(FPS)
 
     def init(self):
         pygame.init()
         self.all_sprites = pygame.sprite.Group()
+        self.shop_fone_group = pygame.sprite.Group()
         self.tile_group = pygame.sprite.Group()
         self.map_tile_group = pygame.sprite.Group()
         self.hero_group = pygame.sprite.Group()
@@ -1042,7 +1167,8 @@ class Game:
         set_map(load_map(f'Saves/Save{self.save}/Map.txt'))
         with open(f'Saves/Save{self.save}/Save.txt', mode='r', encoding='utf-8') as save_file:
             data_lines = save_file.readlines()
-        self.character = Hero(0, f'Saves/Save{self.save}/Inv.txt')
+        self.character = Hero(f'Saves/Save{self.save}/Inv.txt')
+        self.shop = Shop()
         self.run_type = 'farm'
         self.game_clock = GameClock(data_lines[2])
         self.money = Money(data_lines[3])
