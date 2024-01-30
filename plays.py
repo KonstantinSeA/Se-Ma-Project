@@ -1010,7 +1010,7 @@ class Game:
             self.character.enb.energy = 76
             self.character.enb.update()
         else:
-            self.character.enb.energy = 16
+            self.character.enb.energy = 36
             self.character.enb.update()
 
     def reset(self):
