@@ -8,6 +8,7 @@ from plays import game
 
 
 class StartedMenu(QWidget):
+    # Виджет для Отображения Стартового Меню
     def __init__(self):
         super().__init__()
         uic.loadUi('MenuDesign/StartedMenu.ui', self)
@@ -39,6 +40,7 @@ class StartedMenu(QWidget):
 
 
 class SavesMenu(QWidget):
+    # Виджет для Отображения Меню Выбора Сохранений
     def __init__(self, prev):
         super().__init__()
         self.prev = prev
@@ -85,6 +87,7 @@ class SavesMenu(QWidget):
 
 
 class GameMenu(QWidget):
+    # Виджет для Отображения Меню выбора действия с сохранением
     def __init__(self, prev, save):
         super().__init__()
         self.prev, self.save = prev, save

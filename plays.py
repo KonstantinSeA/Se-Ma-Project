@@ -11,6 +11,7 @@ MI_LIST = ['Wood', 'Pumpkin', 'Pumpkin_Seeds', 'Tomato', 'Tomato_Seeds', 'Pepper
 
 
 def load_image(name, road, colorkey=None):
+    # Функция-Загрузчик Изображений
     fullname = os.path.join(road, name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением {fullname} не найден")
@@ -25,6 +26,7 @@ def load_image(name, road, colorkey=None):
 
 
 class Tile(pygame.sprite.Sprite):
+    # Класс Спрайта Тайлов Отображающий Их На Поле
     def __init__(self, tile, pos_x, pos_y):
         self.tile = tile.split(';')
         self.x, self.y = pos_x, pos_y
@@ -254,6 +256,7 @@ class Tile(pygame.sprite.Sprite):
 
 
 class SubTile(pygame.sprite.Sprite):
+    # Вспомогательный Класс-Тайл редко необходимый при отрисовке сложных обьектов
     def __init__(self, x, y, arg):
         if arg == 'td':
             super().__init__(game.all_sprites, game.tile_group)
@@ -263,6 +266,7 @@ class SubTile(pygame.sprite.Sprite):
 
 
 def load_map(file):
+    # Функция-Зашрузчик обрабатывающая текстовые файлы и превращающая их в экземпляры тайлов
     with open(file, 'r') as f:
         map_level = list(map(str.strip, f.readlines()))
     w = []
@@ -275,12 +279,14 @@ def load_map(file):
 
 
 def set_map(map_level):
+    # Спомогательная Функция-Обработчик текстовых карт
     for i in range(len(map_level[0])):
         for j in range(len(map_level[0][i])):
             Tile(map_level[0][i][j], j, i)
 
 
 class Item(pygame.sprite.Sprite):
+    # Спрайт Предметов в инвенторе
     def __init__(self, item_name, pos, *args):
         super().__init__(game.all_sprites, game.menu_group)
         self.name, self.pos = item_name, pos
@@ -423,6 +429,7 @@ class Item(pygame.sprite.Sprite):
 
 
 class MyPoint(pygame.sprite.Sprite):
+    # Вспомогательный Класс_Спрайт, необходимый для обработки действий героя
     def __init__(self, ori, pos):
         super().__init__(game.all_sprites, game.worked_group)
         self.image = pygame.Surface((1, 1), pygame.SRCALPHA, 32)
@@ -439,6 +446,7 @@ class MyPoint(pygame.sprite.Sprite):
 
 
 class Inventory(pygame.sprite.Sprite):
+    # Спрайт Инвентаря
     def __init__(self, file):
         super().__init__(game.all_sprites, game.menu_group)
         self.items = []
@@ -514,6 +522,7 @@ class Inventory(pygame.sprite.Sprite):
 
 
 class EnergyBar(pygame.sprite.Sprite):
+    # Спрайт Столбика Энергии
     def __init__(self):
         super().__init__(game.all_sprites, game.menu_group)
         self.energy = 70
@@ -538,6 +547,7 @@ class EnergyBar(pygame.sprite.Sprite):
 
 
 class Hero(pygame.sprite.Sprite):
+    # Спрайт Героя также обрабатывающий действия героя
     def __init__(self, inv):
         super().__init__(game.all_sprites, game.hero_group)
         self.image = pygame.Surface((20, 45), pygame.SRCALPHA, 32)
@@ -609,6 +619,7 @@ class Hero(pygame.sprite.Sprite):
 
 
 def mask_collide(sprite, sprite_group):
+    # Вспомогательная функция помогающая проверять пересечения маски с группой спрайтов
     for s in sprite_group:
         if pygame.sprite.collide_mask(sprite, s):
             return True
@@ -616,6 +627,7 @@ def mask_collide(sprite, sprite_group):
 
 
 class HeroBoots(pygame.sprite.Sprite):
+    # Вспомогательный Класс необходимый для правильной работы пересечений
     def __init__(self, hero):
         super().__init__(game.all_sprites, game.hero_boots_group)
         self.image = pygame.Surface((20, 15), pygame.SRCALPHA, 32)
@@ -629,6 +641,7 @@ class HeroBoots(pygame.sprite.Sprite):
 
 
 class GameClock(pygame.sprite.Sprite):
+    # Спрайт Времени, Обработчик времени
     def __init__(self, days):
         super().__init__(game.all_sprites, game.menu_group)
         self.days, self.hours, self.minuts = int(days), 4, 0
@@ -658,6 +671,7 @@ class GameClock(pygame.sprite.Sprite):
 
 
 class Money(pygame.sprite.Sprite):
+    # Спрайт-Счетчик Монеток Также обрабатывающий их изменения
     def __init__(self, m):
         super().__init__(game.all_sprites, game.menu_group)
         self.image = load_image('Money.png', 'Sprites/Inv')
@@ -672,6 +686,7 @@ class Money(pygame.sprite.Sprite):
 
 
 class Camera:
+    # Камера со срезанными углами
     def __init__(self):
         self.dx, self.dy = 0, 0
         self.absolute_x, self.absolute_y = 0, 0
@@ -691,6 +706,7 @@ class Camera:
 
 
 class FonWall(pygame.sprite.Sprite):
+    # Спрайт Фоновых стенок
     def __init__(self, t):
         super().__init__(game.all_sprites, game.d_group, game.wall_group)
         if t == 'l':
@@ -721,6 +737,7 @@ class FonWall(pygame.sprite.Sprite):
 
 
 class Fon(pygame.sprite.Sprite):
+    # Визуальный Спрайт Фона
     def __init__(self):
         super().__init__(game.all_sprites, game.tile_group)
         self.image = load_image(f'Farm_Fon.png', 'Sprites')
@@ -734,6 +751,7 @@ class Fon(pygame.sprite.Sprite):
 
 
 class Home:
+    # Класс Компанующий в себе составные части дома
     def __init__(self):
         self.roof = HomeRoof()
         self.wall = HomeWall()
@@ -745,6 +763,7 @@ class Home:
 
 
 class HomeRoof(pygame.sprite.Sprite):
+    # Спрайт Крыши
     def __init__(self):
         super().__init__(game.all_sprites, game.tile_group, game.walked_group)
         self.image = load_image(f'Home_Roof.png', 'Sprites/Home')
@@ -753,6 +772,7 @@ class HomeRoof(pygame.sprite.Sprite):
 
 
 class HomeMat(pygame.sprite.Sprite):
+    # Спрайт Коврика перед дверью
     def __init__(self):
         super().__init__(game.all_sprites, game.tile_group, game.home_t_group)
         self.image = load_image(f'Home_Mat.png', 'Sprites/Home')
@@ -761,6 +781,7 @@ class HomeMat(pygame.sprite.Sprite):
 
 
 class HomeTerrace(pygame.sprite.Sprite):
+    # Спрайт Террасы
     def __init__(self):
         super().__init__(game.all_sprites, game.tile_group)
         self.image = load_image(f'Home_Terrace.png', 'Sprites/Home')
@@ -769,6 +790,7 @@ class HomeTerrace(pygame.sprite.Sprite):
 
 
 class HomeWall(pygame.sprite.Sprite):
+    # Спрайт Стен Дома
     def __init__(self):
         super().__init__(game.all_sprites, game.tile_group, game.d_mask_group)
         self.image = load_image(f'Home_Wall.png', 'Sprites/Home')
@@ -778,6 +800,7 @@ class HomeWall(pygame.sprite.Sprite):
 
 
 class InHomeFon(pygame.sprite.Sprite):
+    # Спрайт Фона Внутри Дома
     def __init__(self):
         super().__init__(game.all_home_sprites)
         self.image = load_image(f'InHome_Fon.png', 'Sprites/Home')
@@ -786,6 +809,7 @@ class InHomeFon(pygame.sprite.Sprite):
 
 
 class InHomeMoved(pygame.sprite.Sprite):
+    # Спрайт Накладываемых Обьектов Внутри Дома
     def __init__(self):
         super().__init__(game.moved_home_sprites)
         self.image = load_image(f'InHome_Moved.png', 'Sprites/Home')
@@ -794,6 +818,7 @@ class InHomeMoved(pygame.sprite.Sprite):
 
 
 class InHomeFonBorders(pygame.sprite.Sprite):
+    # Спрайт Границ Дома
     def __init__(self):
         super().__init__(game.all_home_sprites)
         self.image = load_image(f'InHome_Border.png', 'Sprites/Home')
@@ -802,6 +827,7 @@ class InHomeFonBorders(pygame.sprite.Sprite):
 
 
 class CellBox(pygame.sprite.Sprite):
+    # Спрайт Ящика для Продажи Предметов, Обработчик Ящика
     def __init__(self):
         super().__init__(game.all_sprites, game.tile_group, game.d_mask_group)
         self.image = load_image('Mask_Box.png', 'Sprites/Home')
@@ -868,6 +894,7 @@ class CellBox(pygame.sprite.Sprite):
 
 
 class Shop(pygame.sprite.Sprite):
+    # Спрайт Магазина, Обработчик магазина
     def __init__(self):
         super().__init__(game.all_sprites, game.tile_group, game.d_group)
         self.image = load_image('Shop.png', 'Sprites/Hero')
@@ -956,6 +983,7 @@ class Shop(pygame.sprite.Sprite):
 
 
 class ShopFone(pygame.sprite.Sprite):
+    # Спрайт Фона Магазина
     def __init__(self):
         super().__init__(game.shop_fone_group)
         self.image = load_image('ShopMenu.png', 'Sprites')
@@ -964,10 +992,12 @@ class ShopFone(pygame.sprite.Sprite):
 
 
 class Game:
+    # Класс Компанующий в себе всю игру, позволяет удобно импортировать игру
     def __init__(self, save):
         self.save = save
 
     def next_day(self):
+        # Метод Сохраняющий Прогресс и Запускающий Следующие Сутки
         self.game_clock.days += 1
         self.game_clock.hours = 4
         self.game_clock.minuts = 0
@@ -1014,6 +1044,7 @@ class Game:
             self.character.enb.update()
 
     def reset(self):
+        # Метод Обнуляющий Прогресс
         with open(f'Saves/Standart/Map.txt', mode='r', encoding='utf-8') as map_file:
             standart_map = map_file.readlines()
         with open(f'Saves/Save{self.save}/Map.txt', mode='w', encoding='utf-8') as map_file:
@@ -1028,6 +1059,7 @@ class Game:
             save_file.writelines(''.join(standart_save))
 
     def run(self):
+        # Основной Цикл Игры
         while self.running:
             if self.run_type == 'farm':
                 for event in pygame.event.get():
@@ -1155,6 +1187,7 @@ class Game:
                 self.clock.tick(FPS)
 
     def init(self):
+        # Инициализация Сущностей
         pygame.init()
         self.all_sprites = pygame.sprite.Group()
         self.shop_fone_group = pygame.sprite.Group()
