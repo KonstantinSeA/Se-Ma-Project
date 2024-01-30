@@ -143,8 +143,8 @@ class Tile(pygame.sprite.Sprite):
                 self.rect.x, self.rect.y = x + 30,  y + 90
                 self.hp = 10
                 game.character.inv.add_item('Wood', 15)
-        elif self.tile[0] == 'Stump' and (arg == 'ua' or arg == 'uia' or arg == 'uga' or
-                arg == 'uira'):
+        elif self.tile[0] == 'Stump' and (arg == 'ua' or arg == 'uia' or
+                                          arg == 'uga' or arg == 'uira'):
             self.hp -= 1
             if self.hp < 1:
                 x, y = self.rect.x, self.rect.y
@@ -982,8 +982,6 @@ class Game:
                 long_grow_tile[i][1] -= 1
         for t in small_grow_tile:
             t[0].update('sge')
-
-
         old_map = load_map(f'Saves/Save{self.save}/Map.txt')[0]
         for tile in self.map_tile_group:
             old_map[tile.y][tile.x] = ';'.join(tile.tile)
@@ -1016,7 +1014,18 @@ class Game:
             self.character.enb.update()
 
     def reset(self):
-        pass
+        with open(f'Saves/Standart/Map.txt', mode='r', encoding='utf-8') as map_file:
+            standart_map = map_file.readlines()
+        with open(f'Saves/Save{self.save}/Map.txt', mode='w', encoding='utf-8') as map_file:
+            map_file.writelines(''.join(standart_map))
+        with open(f'Saves/Standart/Inv.txt', mode='r', encoding='utf-8') as inv_file:
+            standart_inv = inv_file.readlines()
+        with open(f'Saves/Save{self.save}/Inv.txt', mode='w', encoding='utf-8') as inv_file:
+            inv_file.writelines(''.join(standart_inv))
+        with open(f'Saves/Standart/Save.txt', mode='r', encoding='utf-8') as save_file:
+            standart_save = save_file.readlines()
+        with open(f'Saves/Save{self.save}/Save.txt', mode='w', encoding='utf-8') as save_file:
+            save_file.writelines(''.join(standart_save))
 
     def run(self):
         while self.running:
