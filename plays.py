@@ -307,7 +307,7 @@ class Item(pygame.sprite.Sprite):
         used_tile = pygame.sprite.spritecollide(point, game.all_sprites, False)
         if used_tile:
             if len(used_tile) > 3:
-                if str(type(used_tile[3])) == "<class '__main__.CellBox'>":
+                if str(type(used_tile[3])) == "<class 'plays.CellBox'>":
                     used_tile[3].update()
                     return
             if game.character.enb.enable():

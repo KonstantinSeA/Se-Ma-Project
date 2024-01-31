@@ -26,6 +26,7 @@ class StartedMenu(QWidget):
 
     def run_play(self):
         self.hide()
+        game.save = 'a'
         game.init()
         game.run()
         sys.exit()
