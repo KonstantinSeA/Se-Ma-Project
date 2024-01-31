@@ -1062,6 +1062,7 @@ class Game:
         # Основной Цикл Игры
         while self.running:
             if self.run_type == 'farm':
+                pygame.mouse.set_visible(False)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.running = False
@@ -1125,6 +1126,7 @@ class Game:
                 pygame.display.flip()
                 self.clock.tick(FPS)
             elif self.run_type == 'home':
+                pygame.mouse.set_visible(False)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.running = False
@@ -1172,6 +1174,7 @@ class Game:
                 pygame.display.flip()
                 self.clock.tick(FPS)
             elif self.run_type == 'shop':
+                pygame.mouse.set_visible(True)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.running = False
@@ -1211,6 +1214,8 @@ class Game:
         self.screen = pygame.display.set_mode(self.size)
         self.clock = pygame.time.Clock()
         self.running = True
+        pygame.mixer.music.load("Menu/PhotoSounds/Farmers_Valley.mp3")
+        pygame.mixer.music.play(-1)
         self.camera = Camera()
         set_map(load_map(f'Saves/Save{self.save}/Map.txt'))
         with open(f'Saves/Save{self.save}/Save.txt', mode='r', encoding='utf-8') as save_file:
