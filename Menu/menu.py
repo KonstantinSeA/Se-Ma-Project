@@ -4,6 +4,7 @@ import pygame
 import sys
 from classbutton import PhotoButton
 from classvidoe import Video
+from plays import game
 
 pygame.init()
 
@@ -12,49 +13,49 @@ width, height = 1280, 720
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Farmes's Valley")
 
-play_button = PhotoButton(width / 2 - (770 / 2), 450, 220, 175, "", "play_button_hide.png",
-                          "play_button_show.png", "button_click.mp3")
-save_button = PhotoButton(width / 2 - (250 / 2), 450, 220, 175, "", "save_button_hide.png",
-                          "save_button_show.png", "button_click.mp3")
-exit_button = PhotoButton(width / 2 - (-270 / 2), 450, 220, 175, "", "exit_button_hide.png",
-                          "exit_button_show.png", "button_click.mp3")
-back_button = PhotoButton(width / 2 - (-800 / 2), 625, 200, 80, "", "back_button_hide.png",
-                          "back_button_show.png", "button_click.mp3")
-woman_button_hide = PhotoButton(width / 2 - (-20/2), 320, 90, 90, "", "player_woman_hide.png",
-                                "", "button_click.mp3")
-man_button_hide = PhotoButton(width / 2 - (200/2), 320, 90, 90, "", "player_man_hide.png",
-                              "", "button_click.mp3")
-woman_button_show = PhotoButton(width / 2 - (-20/2), 320, 90, 90, "", "player_woman_show.png",
-                                "", "button_click.mp3")
-man_button_show = PhotoButton(width / 2 - (200/2), 320, 90, 90, "", "player_man_show.png",
-                              "", "button_click.mp3")
-start_button = PhotoButton(width / 2 - (1200 / 2), 625, 200, 80, "", "start_button_hide.png",
-                           "start_button_show.png", "button_click.mp3")
-setting_button = PhotoButton(width / 2 - (-1155 / 2), 9, 60, 57, "", "settings_button.png", "",
-                             "button_click.mp3")
-plus_button = PhotoButton(width / 2 - (770 / 2), 450, 120, 85, "", "plus_button.png",
-                          "", "button_click.mp3")
-minus_button = PhotoButton(width / 2 - (-270 / 2), 450, 120, 85, "", "minus_button.png",
-                          "", "button_click.mp3")
-man_photo = pygame.image.load('man_photo.png')
-woman_photo = pygame.image.load('woman_photo.png')
-cursor = pygame.image.load("cursor.png")
-fon_pers = pygame.image.load("fon_pers.png")
+play_button = PhotoButton(width / 2 - (770 / 2), 450, 220, 175, "", "PhotoSounds/play_button_hide.png",
+                          "PhotoSounds/play_button_show.png", "PhotoSounds/button_click.mp3")
+save_button = PhotoButton(width / 2 - (250 / 2), 450, 220, 175, "", "PhotoSounds/save_button_hide.png",
+                          "PhotoSounds/save_button_show.png", "PhotoSounds/button_click.mp3")
+exit_button = PhotoButton(width / 2 - (-270 / 2), 450, 220, 175, "", "PhotoSounds/exit_button_hide.png",
+                          "PhotoSounds/exit_button_show.png", "PhotoSounds/button_click.mp3")
+back_button = PhotoButton(width / 2 - (-800 / 2), 625, 200, 80, "", "PhotoSounds/back_button_hide.png",
+                          "PhotoSounds/back_button_show.png", "PhotoSounds/button_click.mp3")
+woman_button_hide = PhotoButton(width / 2 - (-20/2), 320, 90, 90, "", "PhotoSounds/player_woman_hide.png",
+                                "", "PhotoSounds/button_click.mp3")
+man_button_hide = PhotoButton(width / 2 - (200/2), 320, 90, 90, "", "PhotoSounds/player_man_hide.png",
+                              "", "PhotoSounds/button_click.mp3")
+woman_button_show = PhotoButton(width / 2 - (-20/2), 320, 90, 90, "", "PhotoSounds/player_woman_show.png",
+                                "", "PhotoSounds/button_click.mp3")
+man_button_show = PhotoButton(width / 2 - (200/2), 320, 90, 90, "", "PhotoSounds/player_man_show.png",
+                              "", "PhotoSounds/button_click.mp3")
+start_button = PhotoButton(width / 2 - (1200 / 2), 625, 200, 80, "", "PhotoSounds/start_button_hide.png",
+                           "PhotoSounds/start_button_show.png", "PhotoSounds/button_click.mp3")
+setting_button = PhotoButton(width / 2 - (-1155 / 2), 9, 60, 57, "", "PhotoSounds/settings_button.png", "",
+                             "PhotoSounds/button_click.mp3")
+plus_button = PhotoButton(width / 2 - (770 / 2), 450, 120, 85, "", "PhotoSounds/plus_button.png",
+                          "", "PhotoSounds/button_click.mp3")
+minus_button = PhotoButton(width / 2 - (-270 / 2), 450, 120, 85, "", "PhotoSounds/minus_button.png",
+                          "", "PhotoSounds/button_click.mp3")
+man_photo = pygame.image.load('PhotoSounds/man_photo.png')
+woman_photo = pygame.image.load('PhotoSounds/woman_photo.png')
+cursor = pygame.image.load("PhotoSounds/cursor.png")
+fon_pers = pygame.image.load("PhotoSounds/fon_pers.png")
 pygame.mouse.set_visible(False)
 
-vid = Video("videomenu.mp4")
+vid = Video("PhotoSounds/videomenu.mp4")
 vid.set_size((1280, 720))
-intro = Video("intro.mp4")
+intro = Video("PhotoSounds/intro.mp4")
 intro.set_size((1280, 720))
-pygame.mixer.music.load("Farmers_Valley.mp3")
+pygame.mixer.music.load("PhotoSounds/Farmers_Valley.mp3")
 pygame.mixer.music.play(-1)
 video_time = pygame.USEREVENT + 1
 pygame.time.set_timer(video_time, 30000)
 time_update = pygame.USEREVENT + 1
 pygame.time.set_timer(time_update, 4500)
-font = pygame.font.Font("VCROSDMonoRUSbyD.ttf", 32)
-sound_button = pygame.mixer.Sound("Появление_кнопки.mp3")
-sound_click = pygame.mixer.Sound("Печатание.mp3")
+font = pygame.font.Font("PhotoSounds/VCROSDMonoRUSbyD.ttf", 32)
+sound_button = pygame.mixer.Sound("PhotoSounds/Появление_кнопки.mp3")
+sound_click = pygame.mixer.Sound("PhotoSounds/Печатание.mp3")
 clock = pygame.time.Clock()
 input_box = pygame.Rect(515, 495, 250, 45)
 active = False
@@ -132,7 +133,7 @@ def menu():
 def play_start():
     global personash_check, active, text, font, num, num2, num3
     running = True
-    player = Video("playerpick.mp4")
+    player = Video("PhotoSounds/playerpick.mp4")
     player.set_size((1280, 720))
     while running:
         for event in pygame.event.get():
@@ -170,6 +171,9 @@ def play_start():
                     active = not active
                 else:
                     active = False
+            if event.type == pygame.USEREVENT and event.button == start_button:
+                game.init()
+                game.run()
             if event.type == pygame.KEYDOWN:
                 if active:
                     num2 = 0
@@ -224,7 +228,7 @@ def play_start():
 
 def save_start():
     running = True
-    razrabotka = Video("dontwork.mp4")
+    razrabotka = Video("PhotoSounds/dontwork.mp4")
     razrabotka.set_size((1280, 720))
     while running:
         for event in pygame.event.get():
@@ -258,7 +262,7 @@ def save_start():
 
 def settings():
     running = True
-    settings_fon = Video("settingsfon.mp4")
+    settings_fon = Video("PhotoSounds/settingsfon.mp4")
     settings_fon.set_size((1280, 720))
     while running:
         for event in pygame.event.get():
