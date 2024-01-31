@@ -1,3 +1,5 @@
+import time
+
 import pygame
 import sys
 from classbutton import PhotoButton
@@ -26,7 +28,19 @@ woman_button_show = PhotoButton(width / 2 - (-20/2), 320, 90, 90, "", "player_wo
                                 "", "button_click.mp3")
 man_button_show = PhotoButton(width / 2 - (200/2), 320, 90, 90, "", "player_man_show.png",
                               "", "button_click.mp3")
-
+start_button = PhotoButton(width / 2 - (1200 / 2), 625, 200, 80, "", "start_button_hide.png",
+                           "start_button_show.png", "button_click.mp3")
+setting_button = PhotoButton(width / 2 - (-1155 / 2), 9, 60, 57, "", "settings_button.png", "",
+                             "button_click.mp3")
+plus_button = PhotoButton(width / 2 - (770 / 2), 450, 120, 85, "", "plus_button.png",
+                          "", "button_click.mp3")
+minus_button = PhotoButton(width / 2 - (-270 / 2), 450, 120, 85, "", "minus_button.png",
+                          "", "button_click.mp3")
+man_photo = pygame.image.load('man_photo.png')
+woman_photo = pygame.image.load('woman_photo.png')
+cursor = pygame.image.load("cursor.png")
+fon_pers = pygame.image.load("fon_pers.png")
+pygame.mouse.set_visible(False)
 
 vid = Video("videomenu.mp4")
 vid.set_size((1280, 720))
@@ -38,11 +52,17 @@ video_time = pygame.USEREVENT + 1
 pygame.time.set_timer(video_time, 30000)
 time_update = pygame.USEREVENT + 1
 pygame.time.set_timer(time_update, 4500)
+font = pygame.font.Font("VCROSDMonoRUSbyD.ttf", 32)
+sound_button = pygame.mixer.Sound("Появление_кнопки.mp3")
+sound_click = pygame.mixer.Sound("Печатание.mp3")
 clock = pygame.time.Clock()
 input_box = pygame.Rect(515, 495, 250, 45)
 active = False
 text = ''
-font = pygame.font.Font("VCROSDMonoRUSbyD.ttf", 32)
+num = 0
+num2 = 0
+num3 = 0
+max_fps = 60
 
 intro_check = True
 personash_check = True
@@ -68,34 +88,53 @@ def menu():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.USEREVENT and event.button == exit_button:
+                fade()
                 running = False
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+            if event.type == pygame.USEREVENT and event.button == setting_button:
+                fade()
+                running = False
+                vid.toggle_pause()
+                settings()
             if event.type == pygame.USEREVENT and event.button == play_button:
+                fade()
                 running = False
                 vid.toggle_pause()
                 play_start()
+            if event.type == pygame.USEREVENT and event.button == save_button:
+                fade()
+                running = False
+                vid.toggle_pause()
+                save_start()
             if vid.get_pts() >= 57:
                 vid.restart()
-            for own_button in [play_button, save_button, exit_button]:
+            for own_button in [play_button, save_button, exit_button, setting_button]:
                 own_button.events(event)
         vid.draw_video(screen, (0, 0))
+        setting_button.check_mouse(pygame.mouse.get_pos())
+        setting_button.draw_button(screen)
         play_button.check_mouse(pygame.mouse.get_pos())
         play_button.draw_button(screen)
         save_button.check_mouse(pygame.mouse.get_pos())
         save_button.draw_button(screen)
         exit_button.check_mouse(pygame.mouse.get_pos())
         exit_button.draw_button(screen)
+        x, y = pygame.mouse.get_pos()
+        screen.blit(cursor, (x, y))
+        clock.tick(max_fps)
         pygame.display.update()
 
 
 def play_start():
-    global personash_check, active, color, text, font, sleep_woman, sleep_man
+    global personash_check, active, text, font, num, num2, num3
     running = True
     player = Video("playerpick.mp4")
     player.set_size((1280, 720))
     while running:
-        ui_refresh_rate = clock.tick(60) / 1000
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -103,28 +142,54 @@ def play_start():
                 sys.exit()
             if player.get_pts() >= 55:
                 player.restart()
-            if event.type == pygame.USEREVENT and event.button == woman_button_hide:
-                personash_check = False
-                print(3)
-            if event.type == pygame.USEREVENT and event.button == man_button_hide:
-                personash_check = True
-                print(4)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                woman_button_hide.check_mouse(pygame.mouse.get_pos())
+                if woman_button_hide.is_hovered:
+                    personash_check = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                man_button_hide.check_mouse(pygame.mouse.get_pos())
+                if man_button_hide.is_hovered:
+                    personash_check = True
             if event.type == pygame.USEREVENT and event.button == back_button:
+                fade()
                 vid.toggle_pause()
                 player.close()
+                text = ''
+                personash_check = False
                 menu()
-            for own_button in [back_button, woman_button_hide, woman_button_show, man_button_hide,
-                               man_button_show]:
-                own_button.events(event)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    fade()
+                    vid.toggle_pause()
+                    player.close()
+                    text = ''
+                    personash_check = False
+                    menu()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_box.collidepoint(event.pos):
+                    active = not active
+                else:
+                    active = False
             if event.type == pygame.KEYDOWN:
                 if active:
+                    num2 = 0
+                    num3 = 0
                     if event.key == pygame.K_RETURN:
                         print(text)
                         text = ''
                     elif event.key == pygame.K_BACKSPACE:
                         text = text[:-1]
+                        if num2 == 0:
+                            sound_click.play()
+                            num2 = 1
                     elif len(text) <= 9:
+                        if num3 == 0:
+                            sound_click.play()
+                            num3 = 1
                         text += event.unicode
+            for own_button in [back_button, woman_button_hide, woman_button_show, man_button_hide,
+                               man_button_show, start_button]:
+                own_button.events(event)
         player.draw_video(screen, (0, 0))
         back_button.check_mouse(pygame.mouse.get_pos())
         back_button.draw_button(screen)
@@ -136,13 +201,120 @@ def play_start():
             woman_button_hide.draw_button(screen)
             man_button_show.check_mouse(pygame.mouse.get_pos())
             man_button_show.draw_button(screen)
+            screen.blit(woman_photo, (width / 2 - (250 / 2), 27))
         else:
             woman_button_show.check_mouse(pygame.mouse.get_pos())
             woman_button_show.draw_button(screen)
             man_button_hide.check_mouse(pygame.mouse.get_pos())
             man_button_hide.draw_button(screen)
-
+            screen.blit(man_photo, (width / 2 - (250 / 2), 27))
+        if len(text) > 0:
+            if num == 0:
+                sound_button.play()
+                num = 1
+            start_button.check_mouse(pygame.mouse.get_pos())
+            start_button.draw_button(screen)
+        else:
+            num = 0
+        x, y = pygame.mouse.get_pos()
+        screen.blit(cursor, (x, y))
+        clock.tick(max_fps)
         pygame.display.update()
 
 
-menu()
+def save_start():
+    running = True
+    razrabotka = Video("dontwork.mp4")
+    razrabotka.set_size((1280, 720))
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                sys.exit()
+            if razrabotka.get_pts() >= 55:
+                razrabotka.restart()
+            if event.type == pygame.USEREVENT and event.button == back_button:
+                fade()
+                vid.toggle_pause()
+                razrabotka.close()
+                menu()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    fade()
+                    vid.toggle_pause()
+                    razrabotka.close()
+                    menu()
+            for own_button in [back_button]:
+                own_button.events(event)
+        razrabotka.draw_video(screen, (0, 0))
+        back_button.check_mouse(pygame.mouse.get_pos())
+        back_button.draw_button(screen)
+        x, y = pygame.mouse.get_pos()
+        screen.blit(cursor, (x, y))
+        clock.tick(max_fps)
+        pygame.display.update()
+
+
+def settings():
+    running = True
+    settings_fon = Video("settingsfon.mp4")
+    settings_fon.set_size((1280, 720))
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                sys.exit()
+            if settings_fon.get_pts() >= 55:
+                settings_fon.restart()
+            if event.type == pygame.USEREVENT and event.button == back_button:
+                fade()
+                vid.toggle_pause()
+                settings_fon.close()
+                running = False
+                menu()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    fade()
+                    running = False
+            for own_button in [back_button, plus_button, minus_button]:
+                own_button.events(event)
+        settings_fon.draw_video(screen, (0, 0))
+        back_button.check_mouse(pygame.mouse.get_pos())
+        back_button.draw_button(screen)
+        minus_button.check_mouse(pygame.mouse.get_pos())
+        minus_button.draw_button(screen)
+        plus_button.check_mouse(pygame.mouse.get_pos())
+        plus_button.draw_button(screen)
+        x, y = pygame.mouse.get_pos()
+        screen.blit(cursor, (x, y))
+        clock.tick(max_fps)
+        pygame.display.update()
+
+
+def fade():
+    running = True
+    fade_alpha = 0
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        fade_surface = pygame.Surface((width, height))
+        fade_surface.fill((0, 0, 0))
+        fade_surface.set_alpha(fade_alpha)
+        screen.blit(fade_surface, (0, 0))
+
+        fade_alpha += 5
+        if fade_alpha >= 105:
+            fade_alpha = 255
+            running = False
+
+        pygame.display.flip()
+        clock.tick(max_fps)
+
+
+if __name__ == "__main__":
+    menu()
