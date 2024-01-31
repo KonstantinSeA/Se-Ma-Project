@@ -13,30 +13,65 @@ width, height = 1280, 720
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Farmes's Valley")
 
-play_button = PhotoButton(width / 2 - (770 / 2), 450, 220, 175, "", "Menu/PhotoSounds/play_button_hide.png",
-                          "Menu/PhotoSounds/play_button_show.png", "Menu/PhotoSounds/button_click.mp3")
-save_button = PhotoButton(width / 2 - (250 / 2), 450, 220, 175, "", "Menu/PhotoSounds/save_button_hide.png",
-                          "Menu/PhotoSounds/save_button_show.png", "Menu/PhotoSounds/button_click.mp3")
-exit_button = PhotoButton(width / 2 - (-270 / 2), 450, 220, 175, "", "Menu/PhotoSounds/exit_button_hide.png",
-                          "Menu/PhotoSounds/exit_button_show.png", "Menu/PhotoSounds/button_click.mp3")
-back_button = PhotoButton(width / 2 - (-800 / 2), 625, 200, 80, "", "Menu/PhotoSounds/back_button_hide.png",
-                          "Menu/PhotoSounds/back_button_show.png", "Menu/PhotoSounds/button_click.mp3")
-woman_button_hide = PhotoButton(width / 2 - (-20/2), 320, 90, 90, "", "Menu/PhotoSounds/player_woman_hide.png",
-                                "", "Menu/PhotoSounds/button_click.mp3")
-man_button_hide = PhotoButton(width / 2 - (200/2), 320, 90, 90, "", "Menu/PhotoSounds/player_man_hide.png",
+play_button = PhotoButton(width / 2 - (770 / 2), 450, 220, 175, "",
+                          "Menu/PhotoSounds/play_button_hide.png",
+                          "Menu/PhotoSounds/play_button_show.png",
+                          "Menu/PhotoSounds/button_click.mp3")
+save_button = PhotoButton(width / 2 - (250 / 2), 450, 220, 175, "",
+                          "Menu/PhotoSounds/save_button_hide.png",
+                          "Menu/PhotoSounds/save_button_show.png",
+                          "Menu/PhotoSounds/button_click.mp3")
+exit_button = PhotoButton(width / 2 - (-270 / 2), 450, 220, 175, "",
+                          "Menu/PhotoSounds/exit_button_hide.png",
+                          "Menu/PhotoSounds/exit_button_show.png",
+                          "Menu/PhotoSounds/button_click.mp3")
+back_button = PhotoButton(width / 2 - (-840 / 2), 625, 200, 80, "",
+                          "Menu/PhotoSounds/back_button_hide.png",
+                          "Menu/PhotoSounds/back_button_show.png",
+                          "Menu/PhotoSounds/button_click.mp3")
+woman_button_hide = PhotoButton(width / 2 - (-20/2), 320, 90, 90, "",
+                                "Menu/PhotoSounds/player_woman_hide.png", "",
+                                "Menu/PhotoSounds/button_click.mp3")
+man_button_hide = PhotoButton(width / 2 - (200/2), 320, 90, 90, "",
+                              "Menu/PhotoSounds/player_man_hide.png",
                               "", "Menu/PhotoSounds/button_click.mp3")
-woman_button_show = PhotoButton(width / 2 - (-20/2), 320, 90, 90, "", "Menu/PhotoSounds/player_woman_show.png",
-                                "", "Menu/PhotoSounds/button_click.mp3")
-man_button_show = PhotoButton(width / 2 - (200/2), 320, 90, 90, "", "Menu/PhotoSounds/player_man_show.png",
+woman_button_show = PhotoButton(width / 2 - (-20/2), 320, 90, 90, "",
+                                "Menu/PhotoSounds/player_woman_show.png", "",
+                                "Menu/PhotoSounds/button_click.mp3")
+man_button_show = PhotoButton(width / 2 - (200/2), 320, 90, 90, "",
+                              "Menu/PhotoSounds/player_man_show.png",
                               "", "Menu/PhotoSounds/button_click.mp3")
-start_button = PhotoButton(width / 2 - (1200 / 2), 625, 200, 80, "", "Menu/PhotoSounds/start_button_hide.png",
-                           "Menu/PhotoSounds/start_button_show.png", "Menu/PhotoSounds/button_click.mp3")
-setting_button = PhotoButton(width / 2 - (-1155 / 2), 9, 60, 57, "", "Menu/PhotoSounds/settings_button.png", "",
+start_button = PhotoButton(width / 2 - (1200 / 2), 625, 200, 80, "",
+                           "Menu/PhotoSounds/start_button_hide.png",
+                           "Menu/PhotoSounds/start_button_show.png",
+                           "Menu/PhotoSounds/button_click.mp3")
+setting_button = PhotoButton(width / 2 - (-1155 / 2), 9, 60, 57, "",
+                             "Menu/PhotoSounds/settings_button.png", "",
                              "Menu/PhotoSounds/button_click.mp3")
-plus_button = PhotoButton(width / 2 - (770 / 2), 450, 120, 85, "", "Menu/PhotoSounds/plus_button.png",
-                          "", "Menu/PhotoSounds/button_click.mp3")
-minus_button = PhotoButton(width / 2 - (-270 / 2), 450, 120, 85, "", "Menu/PhotoSounds/minus_button.png",
-                          "", "Menu/PhotoSounds/button_click.mp3")
+plus_button = PhotoButton(width / 2 - (50 / 2), 200, 150, 105, "",
+                          "Menu/PhotoSounds/plus_button.png", "",
+                          "Menu/PhotoSounds/button_click.mp3")
+minus_button = PhotoButton(width / 2 - (400 / 2), 200, 150, 105, "",
+                           "Menu/PhotoSounds/minus_button.png", "",
+                           "Menu/PhotoSounds/button_click.mp3")
+left_save = PhotoButton(width / 2 - (740 / 2), 250, 220, 175, "",
+                        "Menu/PhotoSounds/left_save.png", "",
+                        "Menu/PhotoSounds/button_click.mp3")
+midlle_save = PhotoButton(width / 2 - (220 / 2), 250, 220, 175, "",
+                          "Menu/PhotoSounds/midle_save.png", "",
+                          "Menu/PhotoSounds/button_click.mp3")
+right_save = PhotoButton(width / 2 - (-300 / 2), 250, 220, 175, "",
+                         "Menu/PhotoSounds/right_save.png", "",
+                         "Menu/PhotoSounds/button_click.mp3")
+resert1 = PhotoButton(width / 2 - (680 / 2), 160, 170, 80, "",
+                         "Menu/PhotoSounds/resert1.png", "Menu/PhotoSounds/resert_show.png",
+                         "Menu/PhotoSounds/button_click.mp3")
+resert2 = PhotoButton(width / 2 - (170 / 2), 160, 170, 80, "",
+                         "Menu/PhotoSounds/resert2.png", "Menu/PhotoSounds/resert_show.png",
+                         "Menu/PhotoSounds/button_click.mp3")
+resert3 = PhotoButton(width / 2 - (-355 / 2), 160, 170, 80, "",
+                         "Menu/PhotoSounds/resert3.png", "Menu/PhotoSounds/resert_show.png",
+                         "Menu/PhotoSounds/button_click.mp3")
 man_photo = pygame.image.load('Menu/PhotoSounds/man_photo.png')
 woman_photo = pygame.image.load('Menu/PhotoSounds/woman_photo.png')
 cursor = pygame.image.load("Menu/PhotoSounds/cursor.png")
@@ -67,6 +102,7 @@ max_fps = 60
 
 intro_check = True
 personash_check = True
+music_check = True
 
 
 def menu():
@@ -95,6 +131,7 @@ def menu():
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    fade()
                     running = False
             if event.type == pygame.USEREVENT and event.button == setting_button:
                 fade()
@@ -172,6 +209,7 @@ def play_start():
                 else:
                     active = False
             if event.type == pygame.USEREVENT and event.button == start_button:
+                game.save = 'a'
                 game.init()
                 game.run()
                 sys.exit()
@@ -244,17 +282,57 @@ def save_start():
                 vid.toggle_pause()
                 razrabotka.close()
                 menu()
+            if event.type == pygame.USEREVENT and event.button == left_save:
+                fade()
+                game.save = "a"
+                game.init()
+                game.run()
+                sys.exit()
+            if event.type == pygame.USEREVENT and event.button == midlle_save:
+                fade()
+                game.save = "b"
+                game.init()
+                game.run()
+                sys.exit()
+            if event.type == pygame.USEREVENT and event.button == right_save:
+                fade()
+                game.save = "c"
+                game.init()
+                game.run()
+                sys.exit()
+            if event.type == pygame.USEREVENT and event.button == resert1:
+                game.save = 'a'
+                game.reset()
+            if event.type == pygame.USEREVENT and event.button == resert2:
+                game.save = 'b'
+                game.reset()
+            if event.type == pygame.USEREVENT and event.button == resert3:
+                game.save = 'c'
+                game.reset()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     fade()
                     vid.toggle_pause()
                     razrabotka.close()
                     menu()
-            for own_button in [back_button]:
+            for own_button in [back_button, left_save, midlle_save, right_save, resert1, resert2,
+                               resert3]:
                 own_button.events(event)
         razrabotka.draw_video(screen, (0, 0))
         back_button.check_mouse(pygame.mouse.get_pos())
         back_button.draw_button(screen)
+        left_save.check_mouse(pygame.mouse.get_pos())
+        left_save.draw_button(screen)
+        midlle_save.check_mouse(pygame.mouse.get_pos())
+        midlle_save.draw_button(screen)
+        right_save.check_mouse(pygame.mouse.get_pos())
+        right_save.draw_button(screen)
+        resert1.check_mouse(pygame.mouse.get_pos())
+        resert1.draw_button(screen)
+        resert2.check_mouse(pygame.mouse.get_pos())
+        resert2.draw_button(screen)
+        resert3.check_mouse(pygame.mouse.get_pos())
+        resert3.draw_button(screen)
         x, y = pygame.mouse.get_pos()
         screen.blit(cursor, (x, y))
         clock.tick(max_fps)
@@ -262,6 +340,7 @@ def save_start():
 
 
 def settings():
+    global music_check
     running = True
     settings_fon = Video("Menu/PhotoSounds/settingsfon.mp4")
     settings_fon.set_size((1280, 720))
@@ -283,15 +362,27 @@ def settings():
                 if event.key == pygame.K_ESCAPE:
                     fade()
                     running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                plus_button.check_mouse(pygame.mouse.get_pos())
+                if plus_button.is_hovered:
+                    music_check = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                minus_button.check_mouse(pygame.mouse.get_pos())
+                if minus_button.is_hovered:
+                    music_check = True
             for own_button in [back_button, plus_button, minus_button]:
                 own_button.events(event)
         settings_fon.draw_video(screen, (0, 0))
         back_button.check_mouse(pygame.mouse.get_pos())
         back_button.draw_button(screen)
-        minus_button.check_mouse(pygame.mouse.get_pos())
-        minus_button.draw_button(screen)
-        plus_button.check_mouse(pygame.mouse.get_pos())
-        plus_button.draw_button(screen)
+        if music_check:
+            plus_button.check_mouse(pygame.mouse.get_pos())
+            plus_button.draw_button(screen)
+            pygame.mixer.music.set_volume(0.5)
+        else:
+            minus_button.check_mouse(pygame.mouse.get_pos())
+            minus_button.draw_button(screen)
+            pygame.mixer.music.set_volume(0)
         x, y = pygame.mouse.get_pos()
         screen.blit(cursor, (x, y))
         clock.tick(max_fps)
