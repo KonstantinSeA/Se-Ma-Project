@@ -1214,8 +1214,6 @@ class Game:
         self.screen = pygame.display.set_mode(self.size)
         self.clock = pygame.time.Clock()
         self.running = True
-        pygame.mixer.music.load("Menu/PhotoSounds/Farmers_Valley.mp3")
-        pygame.mixer.music.play(-1)
         self.camera = Camera()
         set_map(load_map(f'Saves/Save{self.save}/Map.txt'))
         with open(f'Saves/Save{self.save}/Save.txt', mode='r', encoding='utf-8') as save_file:
